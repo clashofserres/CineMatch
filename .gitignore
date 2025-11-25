@@ -46,3 +46,4 @@ error-screenshots/
 webpack.generated.js
 
 postgres.env
+.env
