@@ -9,6 +9,7 @@ public class TmdbConfig {
 
     private String key;
     private String token;
+    private String baseUrl;
 
     public String getKey() {
         return key;
@@ -25,4 +26,13 @@ public class TmdbConfig {
     public void setToken(String token) {
         this.token = token;
     }
+
+    public String getBaseUrl() {
+        return baseUrl;
+
+    }
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
 }
+
