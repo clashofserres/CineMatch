@@ -63,3 +63,15 @@ html, spreadsheet-view-export, grid-with-filters-view-export
     --lumo-primary-contrast-color: #ffffff;
     --lumo-error-contrast-color: #ffffff;
 }
+
+/* Animation smoothness */
+.offset-hovered-element {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* The actual Offset and Shadow on Hover */
+.offset-hovered-element:hover {
+    transform: translateY(-5px); /* Moves the card UP by 5 pixels */
+    box-shadow: var(--lumo-box-shadow-m); /* Adds a medium shadow */
+    cursor: pointer; /* Changes mouse cursor to a hand */
+}
