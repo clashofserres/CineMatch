@@ -135,7 +135,7 @@ public class QuizLayout extends VerticalLayout {
 	private Button createAnswerButton(String label, String answerLetter, QuizQuestionDTO question) {
 		Button btn = new Button(label);
 		btn.addClickListener(e -> handleAnswer(answerLetter, question.getCorrect()));
-		btn.setTooltipText("Correct answer: " + question.getCorrect());
+		//btn.setTooltipText("Correct answer: " + question.getCorrect());
 		return btn;
 	}
 
@@ -206,7 +206,7 @@ public class QuizLayout extends VerticalLayout {
 		Button confettiButton = new Button("confettiButton", VaadinIcon.TRASH.create());
 		confettiButton.addClickListener(e-> fireConfetti());
 
-		quizContainer.add(emojiDisplay, title, scoreText, restartBtn, confettiButton);
+		quizContainer.add(emojiDisplay, title, scoreText, restartBtn/*, confettiButton*/);
 		centerQuizContainer();
 	}
 
