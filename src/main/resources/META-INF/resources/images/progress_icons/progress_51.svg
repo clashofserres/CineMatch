@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 75 75">
+    <circle cx="37.5" cy="37.5" r="32" fill="rgb(20, 25, 30)" stroke="rgb(40, 50, 60)" stroke-width="6" /><path d="M 37.50 5.50 A 32 32 0 1 1 35.49 69.44" fill="none" stroke="rgb(249,166,1)" stroke-width="6" stroke-linecap="butt" /><text x="37.5" y="39.9" fill="white" font-family="Roboto, Arial, sans-serif" font-weight="bold" text-anchor="middle" dominant-baseline="middle"><tspan font-size="24">51</tspan><tspan font-size="14" dx="1" dy="-6">%</tspan></text>
+</svg>
