@@ -1,4 +1,4 @@
-package com.clashofserres.cinematch.services;
+package com.clashofserres.cinematch.service;
 
 import com.clashofserres.cinematch.data.model.UserEntity;
 import com.clashofserres.cinematch.repository.UserRepository;
