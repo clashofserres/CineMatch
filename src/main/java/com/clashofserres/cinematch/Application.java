@@ -1,6 +1,7 @@
 package com.clashofserres.cinematch;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import javax.sql.DataSource;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Bean;
  * and some desktop browsers.
  *
  */
+@Push
 @SpringBootApplication
 @EnableConfigurationProperties
 @Theme(value = "cinematch", variant = Lumo.DARK)
