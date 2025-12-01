@@ -12,7 +12,7 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("Home")
 @Route("")
-@Menu(order = 0, icon = LineAwesomeIconUrl.FILM_SOLID, title = "Home")
+@Menu(order = 1, icon = LineAwesomeIconUrl.SEARCH_SOLID, title = "Home")
 public class CineMatchTestView extends VerticalLayout {
 
     public CineMatchTestView() {

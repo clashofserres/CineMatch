@@ -2,7 +2,9 @@ package com.clashofserres.cinematch.controller;
 
 import com.clashofserres.cinematch.data.dto.TmdbMovieDTO;
 import com.clashofserres.cinematch.data.dto.TmdbMovieListResponseDTO;
+import com.clashofserres.cinematch.data.dto.TmdbPersonListResponseDTO;
 import com.clashofserres.cinematch.service.TmdbService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,5 +30,10 @@ public class TmdbController {
     @GetMapping("/popular")
     public TmdbMovieListResponseDTO getPopularMovies() {
         return tmdbService.getPopularMovies();
+    }
+    public ResponseEntity<TmdbPersonListResponseDTO> searchPeople(
+            @RequestParam("query") String query
+    ) {
+        return ResponseEntity.ok(tmdbService.searchPeople(query));
     }
 }
