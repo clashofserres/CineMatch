@@ -4,24 +4,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public record TmdbMovieDTO(
-        Long id,
-        String title,
-        String overview,
+                Long id,
+                String title,
+                String overview,
 
-        @JsonProperty("release_date")
-        String releaseDate,
+                @JsonProperty("release_date") String releaseDate,
 
-        @JsonProperty("poster_path")
-        String posterPath,
+                @JsonProperty("poster_path") String posterPath,
 
-        Double popularity,
+                @JsonProperty("backdrop_path") String backdropPath,
 
-        @JsonProperty("vote_average")
-        Double voteAverage,
+                Double popularity,
 
-        @JsonProperty("vote_count")
-        Integer voteCount,
+                @JsonProperty("vote_average") Double voteAverage,
 
-        @JsonProperty("genre_ids")
-        List<Integer> genreIds
-) {}
+                @JsonProperty("vote_count") Integer voteCount,
+
+                @JsonProperty("genre_ids") List<Integer> genreIds,
+                Integer runtime,
+                List<TmdbGenreDTO> genres,
+                TmdbCreditsDTO credits) {
+}
