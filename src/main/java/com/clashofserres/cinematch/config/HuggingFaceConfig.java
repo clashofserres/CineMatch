@@ -9,6 +9,10 @@ public class HuggingFaceConfig {
 
     private String token;
 
+    private String model;
+
+    private String baseUrl;
+
     public String getToken() {
         return token;
     }
@@ -16,4 +20,25 @@ public class HuggingFaceConfig {
     public void setToken(String token) {
         this.token = token;
     }
+
+    public String getModel()
+    {
+        return model;
+    }
+
+    public void setModel(String model)
+    {
+        this.model = model;
+    }
+
+    public String getBaseUrl()
+    {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl)
+    {
+        this.baseUrl = baseUrl;
+    }
+
 }

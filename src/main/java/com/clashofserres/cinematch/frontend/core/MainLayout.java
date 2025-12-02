@@ -2,13 +2,19 @@ package com.clashofserres.cinematch.frontend.core;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.SvgIcon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.Scroller;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.AfterNavigationEvent;
@@ -30,6 +36,7 @@ import java.util.List;
 public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
     private H1 viewTitle;
+    private boolean isDarkTheme = true; // Dark theme is default
 
     public MainLayout() {
         setPrimarySection(Section.DRAWER);
@@ -75,13 +82,29 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
     private Footer createFooter() {
         Footer layout = new Footer();
 
-        Checkbox darkThemeToggle = new Checkbox("Dark Theme");
-        darkThemeToggle.setValue(true); // Dark theme is default
-        darkThemeToggle.addValueChangeListener(event -> {
-            setTheme(event.getValue());
+        Icon lightbulb = VaadinIcon.LIGHTBULB.create();
+        Icon moon = VaadinIcon.MOON_O.create();
+
+        // Dark theme is default
+        Button themeToggle = new Button(lightbulb);
+        themeToggle.getStyle().setScale("1.1");
+        themeToggle.addClassNames("offset-hovered-element");
+        themeToggle.setTooltipText("Toggle light/dark theme");
+        themeToggle.addThemeVariants(ButtonVariant.LUMO_ICON);
+
+        themeToggle.addClickListener(e -> {
+            isDarkTheme = !isDarkTheme;
+            if (isDarkTheme) {
+                themeToggle.setIcon(lightbulb);
+            } else {
+                themeToggle.setIcon(moon);
+            }
+
+            setTheme(isDarkTheme);
         });
 
-        layout.add(darkThemeToggle);
+        layout.add(themeToggle);
+
 
         return layout;
     }

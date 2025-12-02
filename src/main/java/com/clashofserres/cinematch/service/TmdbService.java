@@ -3,6 +3,8 @@ package com.clashofserres.cinematch.service;
 import com.clashofserres.cinematch.config.TmdbConfig;
 import com.clashofserres.cinematch.data.dto.TmdbMovieDTO;
 import com.clashofserres.cinematch.data.dto.TmdbMovieListResponseDTO;
+import com.clashofserres.cinematch.data.dto.TmdbPersonDTO;
+import com.clashofserres.cinematch.data.dto.TmdbPersonListResponseDTO;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -32,6 +34,10 @@ public class TmdbService {
         return new HttpEntity<>(headers);
     }
 
+    // ----------------------------------
+    // MOVIE METHODS
+    // ----------------------------------
+
     public TmdbMovieListResponseDTO searchMovies(String query) {
         String url = UriComponentsBuilder
                 .fromUriString(tmdbConfig.getBaseUrl() + "/search/movie")
@@ -43,7 +49,6 @@ public class TmdbService {
                 TmdbMovieListResponseDTO.class);
 
         TmdbMovieListResponseDTO body = response.getBody();
-
         return body != null ? body : new TmdbMovieListResponseDTO(0, java.util.List.of(), 0, 0);
     }
 
@@ -66,9 +71,6 @@ public class TmdbService {
         return body;
     }
 
-    // ----------------------------------
-    // POPULAR MOVIES
-    // ----------------------------------
     public TmdbMovieListResponseDTO getPopularMovies() {
         String url = UriComponentsBuilder
                 .fromUriString(tmdbConfig.getBaseUrl() + "/movie/popular")
@@ -79,7 +81,49 @@ public class TmdbService {
                 TmdbMovieListResponseDTO.class);
 
         TmdbMovieListResponseDTO body = response.getBody();
-
         return body != null ? body : new TmdbMovieListResponseDTO(0, java.util.List.of(), 0, 0);
+    }
+
+    // ----------------------------------
+    // ACTOR (PERSON) METHODS
+    // ----------------------------------
+
+
+    public TmdbPersonListResponseDTO searchPeople(String query) {
+        String url = UriComponentsBuilder
+                .fromUriString(tmdbConfig.getBaseUrl() + "/search/person")
+                .queryParam("query", query)
+                .queryParam("api_key", tmdbConfig.getKey())
+                .toUriString();
+
+        ResponseEntity<TmdbPersonListResponseDTO> response =
+                restTemplate.exchange(url, HttpMethod.GET, buildHeaders(), TmdbPersonListResponseDTO.class);
+
+        TmdbPersonListResponseDTO body = response.getBody();
+
+
+        if (body != null) {
+            body.results().forEach(person ->
+                    System.out.println("Actor: " + person.name() + ", Profile Path: " + person.profilePath())
+            );
+        }
+
+        return body != null ? body : new TmdbPersonListResponseDTO(0, java.util.List.of(), 0, 0);
+    }
+
+
+
+    // Method to fetch popular actors
+    public TmdbPersonListResponseDTO getPopularPeople() {
+        String url = UriComponentsBuilder
+                .fromUriString(tmdbConfig.getBaseUrl() + "/person/popular")
+                .queryParam("api_key", tmdbConfig.getKey())
+                .toUriString();
+
+        ResponseEntity<TmdbPersonListResponseDTO> response =
+                restTemplate.exchange(url, HttpMethod.GET, buildHeaders(), TmdbPersonListResponseDTO.class);
+
+        TmdbPersonListResponseDTO body = response.getBody();
+        return body != null ? body : new TmdbPersonListResponseDTO(0, java.util.List.of(), 0, 0);
     }
 }

@@ -39,10 +39,11 @@ public class MovieCard extends VerticalLayout {
             }
         });
 
-        int ratingPercent = (int) Math.round(rating * 10);
+        // 1. Calculate percentage for the filename
+        int percentage = (int) Math.round(rating * 10);
 
-        // CARD that contains poster + rating bar
         Card posterCard = new Card();
+        posterCard.addClassName("offset-hovered-element");
         posterCard.getStyle()
                 .set("padding", "0")
                 .set("border-radius", "8px");
@@ -52,14 +53,38 @@ public class MovieCard extends VerticalLayout {
         posterCard.setWidth("160px");
         posterCard.setHeight("auto");
 
-        posterCard.setMedia(createPosterMedia(posterPath, title));
+        // --- WRAPPER FOR OVERLAY LOGIC ---
+        Div imageContainer = new Div();
+        imageContainer.setWidth("100%");
+        imageContainer.getStyle().set("position", "relative"); // Essential for absolute positioning of children
+
+        // A. The Poster
+        Component poster = createPosterMedia(posterPath, title);
+
+        // B. The Rating Image (Requested Line)
+        Image ratingImg = new Image("images/progress_icons/progress_" + percentage + ".svg", percentage + "%");
+
+        // C. Style the Rating Image to float on top
+        ratingImg.setWidth("38px");  // Adjust size as needed
+        ratingImg.setHeight("38px");
+        ratingImg.getStyle()
+                .set("position", "absolute")
+                .set("bottom", "-10px")      // Negative value makes it hang slightly off the bottom edge
+                .set("left", "10px")         // Distance from left
+                .set("background-color", "#081c22") // Dark background (TMDB style) to make it readable
+                .set("border-radius", "50%") // Make background circular
+                .set("padding", "2px")       // Slight padding inside the dark circle
+                .set("z-index", "2");        // Ensure it sits on top of the poster
+
+        // Add both to the wrapper
+        imageContainer.add(poster, ratingImg);
 
         // TEXT BELOW CARD -------------------------------------------------
         Span titleLabel = new Span(title);
         titleLabel.getStyle()
                 .set("font-weight", "600")
                 .set("font-size", "var(--lumo-font-size-s)")
-                .set("margin-top", "0.3rem");
+                .set("margin-top", "1rem"); // Increased margin slightly to account for the overlapping icon
 
         Span dateLabel = new Span(normalizeDate(releaseDate));
         dateLabel.getStyle()
@@ -73,14 +98,16 @@ public class MovieCard extends VerticalLayout {
         if (posterPath != null) {
             Image image = new Image("https://image.tmdb.org/t/p/w300" + posterPath, title);
             image.setWidth("100%");
-            image.getStyle().set("border-radius", "8px");
+            image.getStyle()
+                    .set("border-radius", "8px")
+                    .set("display", "block"); // Removes bottom phantom spacing in some browsers
             return image;
         }
 
-        // FALLBACK WRAPPER SAME SIZE AS IMAGE
+        // FALLBACK WRAPPER
         Div placeholder = new Div();
         placeholder.setWidth("100%");
-        placeholder.setHeight("240px"); // same as typical 300px width 2:3 ratio
+        placeholder.setHeight("240px");
         placeholder.getStyle()
                 .set("display", "flex")
                 .set("align-items", "center")
@@ -107,5 +134,4 @@ public class MovieCard extends VerticalLayout {
             return apiDate;
         }
     }
-
 }
