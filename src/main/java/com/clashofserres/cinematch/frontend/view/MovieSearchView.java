@@ -93,7 +93,7 @@ public class MovieSearchView extends VerticalLayout {
 			String release = movie.releaseDate() != null ? movie.releaseDate() : "Unknown";
 			double rating = movie.voteAverage() != null ? movie.voteAverage() : 0.0;
 
-			movieResults.add(new MovieCard(title, poster, release, rating));
+			movieResults.add(new MovieCard(movie.id(), title, poster, release, rating));
 		});
 	}
 }

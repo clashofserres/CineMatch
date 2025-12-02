@@ -39,8 +39,8 @@ public class TmdbService {
                 .queryParam("api_key", tmdbConfig.getKey())
                 .toUriString();
 
-        ResponseEntity<TmdbMovieListResponseDTO> response =
-                restTemplate.exchange(url, HttpMethod.GET, buildHeaders(), TmdbMovieListResponseDTO.class);
+        ResponseEntity<TmdbMovieListResponseDTO> response = restTemplate.exchange(url, HttpMethod.GET, buildHeaders(),
+                TmdbMovieListResponseDTO.class);
 
         TmdbMovieListResponseDTO body = response.getBody();
 
@@ -51,10 +51,11 @@ public class TmdbService {
         String url = UriComponentsBuilder
                 .fromUriString(tmdbConfig.getBaseUrl() + "/movie/" + id)
                 .queryParam("api_key", tmdbConfig.getKey())
+                .queryParam("append_to_response", "credits")
                 .toUriString();
 
-        ResponseEntity<TmdbMovieDTO> response =
-                restTemplate.exchange(url, HttpMethod.GET, buildHeaders(), TmdbMovieDTO.class);
+        ResponseEntity<TmdbMovieDTO> response = restTemplate.exchange(url, HttpMethod.GET, buildHeaders(),
+                TmdbMovieDTO.class);
 
         TmdbMovieDTO body = response.getBody();
 
@@ -74,8 +75,8 @@ public class TmdbService {
                 .queryParam("api_key", tmdbConfig.getKey())
                 .toUriString();
 
-        ResponseEntity<TmdbMovieListResponseDTO> response =
-                restTemplate.exchange(url, HttpMethod.GET, buildHeaders(), TmdbMovieListResponseDTO.class);
+        ResponseEntity<TmdbMovieListResponseDTO> response = restTemplate.exchange(url, HttpMethod.GET, buildHeaders(),
+                TmdbMovieListResponseDTO.class);
 
         TmdbMovieListResponseDTO body = response.getBody();
 
