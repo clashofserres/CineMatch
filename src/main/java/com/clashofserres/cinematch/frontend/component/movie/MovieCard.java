@@ -1,5 +1,6 @@
 package com.clashofserres.cinematch.frontend.component.movie;
 
+import com.clashofserres.cinematch.data.dto.TmdbMovieDTO;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.html.Div;
@@ -12,43 +13,29 @@ import com.vaadin.flow.theme.lumo.LumoIcon;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class MovieCard extends VerticalLayout {
-
+public class MovieCard extends VerticalLayout
+{
     public MovieCard(Long movieId, String title, String posterPath, String releaseDate, double rating) {
         setPadding(false);
         setSpacing(false);
         setWidth("160px");
-        getStyle()
-                .set("align-items", "flex-start")
-                .set("cursor", "pointer");
+        getStyle().set("align-items", "flex-start");
 
-        // Add hover effect
-        getElement().addEventListener("mouseenter", e -> {
-            getStyle().set("transform", "translateY(-4px)");
-            getStyle().set("transition", "transform 0.2s ease");
-        });
+        // 1. Calculate percentage for the filename
+        int percentage = (int) Math.round(rating * 10);
 
-        getElement().addEventListener("mouseleave", e -> {
-            getStyle().set("transform", "translateY(0)");
-        });
-
-        // Add click listener to navigate to detail page
         addClickListener(event -> {
             if (movieId != null) {
                 getUI().ifPresent(ui -> ui.navigate("movie/" + movieId));
             }
         });
 
-        // 1. Calculate percentage for the filename
-        int percentage = (int) Math.round(rating * 10);
-
         Card posterCard = new Card();
         posterCard.addClassName("offset-hovered-element");
         posterCard.getStyle()
                 .set("padding", "0")
-                .set("border-radius", "8px");
-        // .set("overflow", "hidden") // ensures content fills card shape
-        // .set("aspect-ratio", "2 / 3"); // fixed poster ratio
+                .set("border-radius", "8px")
+                .set("overflow", "visible");
 
         posterCard.setWidth("160px");
         posterCard.setHeight("auto");
@@ -79,6 +66,9 @@ public class MovieCard extends VerticalLayout {
         // Add both to the wrapper
         imageContainer.add(poster, ratingImg);
 
+        // Add wrapper to the card
+        posterCard.add(imageContainer);
+
         // TEXT BELOW CARD -------------------------------------------------
         Span titleLabel = new Span(title);
         titleLabel.getStyle()
@@ -94,8 +84,10 @@ public class MovieCard extends VerticalLayout {
         add(posterCard, titleLabel, dateLabel);
     }
 
-    private Component createPosterMedia(String posterPath, String title) {
-        if (posterPath != null) {
+    private Component createPosterMedia(String posterPath, String title)
+    {
+        if (posterPath != null)
+        {
             Image image = new Image("https://image.tmdb.org/t/p/w300" + posterPath, title);
             image.setWidth("100%");
             image.getStyle()
@@ -123,11 +115,10 @@ public class MovieCard extends VerticalLayout {
         return placeholder;
     }
 
-    private String normalizeDate(String apiDate) {
+    private String normalizeDate(String apiDate)
+    {
         try {
-            LocalDate date = LocalDate.parse(apiDate); // ISO format works directly
-
-            // format to "MMMM dd, yyyy"
+            LocalDate date = LocalDate.parse(apiDate);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
             return date.format(formatter);
         } catch (Exception e) {
