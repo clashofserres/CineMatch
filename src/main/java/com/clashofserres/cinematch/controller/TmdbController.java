@@ -27,13 +27,15 @@ public class TmdbController {
         return tmdbService.getMovieDetails(id);
     }
 
-    @GetMapping("/popular")
-    public TmdbMovieListResponseDTO getPopularMovies() {
-        return tmdbService.getPopularMovies();
-    }
-    public ResponseEntity<TmdbPersonListResponseDTO> searchPeople(
-            @RequestParam("query") String query
-    ) {
+    @GetMapping("/person/search")
+    public ResponseEntity<TmdbPersonListResponseDTO> searchPeople(@RequestParam String query) {
         return ResponseEntity.ok(tmdbService.searchPeople(query));
     }
+
+    @GetMapping("/person/popular")
+    public ResponseEntity<TmdbPersonListResponseDTO> getPopularPeople() {
+        return ResponseEntity.ok(tmdbService.getPopularPeople());
+    }
+
+
 }

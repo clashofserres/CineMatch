@@ -22,6 +22,9 @@ public record TmdbMovieDTO(
 
                 @JsonProperty("genre_ids") List<Integer> genreIds,
                 Integer runtime,
+                Long revenue,
                 List<TmdbGenreDTO> genres,
-                TmdbCreditsDTO credits) {
+                TmdbCreditsDTO credits,
+                Double starPowerIndex,
+                Double boxOfficeScore) {
 }

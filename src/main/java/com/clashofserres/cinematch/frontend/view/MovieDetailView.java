@@ -153,6 +153,33 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
                 .set("max-width", "1200px")
                 .set("margin", "0 auto");
 
+        // KPIs row(Star Power Index & Box Office Score)
+        HorizontalLayout kpiRow = new HorizontalLayout();
+        kpiRow.setSpacing(true);
+        kpiRow.getStyle().set("gap", "1rem");
+
+        // Star Power Index Badge
+        if (movie.starPowerIndex() != null) {
+            Span starPowerBadge = new Span(String.format("Star Power: %.1f", movie.starPowerIndex()));
+            starPowerBadge.getElement().getThemeList().add("badge success"); // Πράσινο χρώμα
+            starPowerBadge.getStyle()
+                    .set("font-weight", "bold")
+                    .set("font-size", "var(--lumo-font-size-s)");
+            kpiRow.add(starPowerBadge);
+        }
+
+        // Box Office Score Badge
+        if (movie.boxOfficeScore() != null) {
+            Span boxOfficeBadge = new Span(String.format("Box Office Score: %.1f", movie.boxOfficeScore()));
+            boxOfficeBadge.getElement().getThemeList().add("badge contrast"); // Γκρι/Μαύρο χρώμα
+            boxOfficeBadge.getStyle()
+                    .set("font-weight", "bold")
+                    .set("font-size", "var(--lumo-font-size-s)");
+            kpiRow.add(boxOfficeBadge);
+        }
+
+        infoLayout.add(kpiRow);
+
         // Metadata row (release date, rating, runtime)
         HorizontalLayout metadataRow = new HorizontalLayout();
         metadataRow.setSpacing(true);

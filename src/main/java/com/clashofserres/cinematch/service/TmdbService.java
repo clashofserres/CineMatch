@@ -1,14 +1,13 @@
 package com.clashofserres.cinematch.service;
 
 import com.clashofserres.cinematch.config.TmdbConfig;
-import com.clashofserres.cinematch.data.dto.TmdbMovieDTO;
-import com.clashofserres.cinematch.data.dto.TmdbMovieListResponseDTO;
-import com.clashofserres.cinematch.data.dto.TmdbPersonDTO;
-import com.clashofserres.cinematch.data.dto.TmdbPersonListResponseDTO;
+import com.clashofserres.cinematch.data.dto.*; // Import  DTOs
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Comparator;
 
 @Service
 public class TmdbService {
@@ -68,7 +67,7 @@ public class TmdbService {
             throw new TmdbServiceException("No movie found with id " + id);
         }
 
-        return body;
+        return enrichMovieWithKPIs(body);
     }
 
     public TmdbMovieListResponseDTO getPopularMovies() {
@@ -125,5 +124,61 @@ public class TmdbService {
 
         TmdbPersonListResponseDTO body = response.getBody();
         return body != null ? body : new TmdbPersonListResponseDTO(0, java.util.List.of(), 0, 0);
+    }
+    // ----------------------------------
+    // KPI CALCULATION METHODS
+    // ----------------------------------
+
+
+    private TmdbMovieDTO enrichMovieWithKPIs(TmdbMovieDTO movie) {
+
+        Double starPower = calculateStarPowerIndex(movie.credits());
+
+
+        Double boxOffice = calculateBoxOfficeScore(movie.voteCount(), movie.revenue());
+
+
+        return new TmdbMovieDTO(
+                movie.id(),
+                movie.title(),
+                movie.overview(),
+                movie.releaseDate(),
+                movie.posterPath(),
+                movie.backdropPath(),
+                movie.popularity(),
+                movie.voteAverage(),
+                movie.voteCount(),
+                movie.genreIds(),
+                movie.runtime(),
+                movie.revenue(),
+                movie.genres(),
+                movie.credits(),
+                starPower,
+                boxOffice
+        );
+    }
+
+    private Double calculateStarPowerIndex(TmdbCreditsDTO credits) {
+
+        if (credits == null || credits.cast() == null || credits.cast().isEmpty()) {
+            return 0.0;
+        }
+
+        return credits.cast().stream()
+
+                .sorted(Comparator.comparing(TmdbCastMemberDTO::popularity, Comparator.nullsLast(Comparator.reverseOrder())))
+
+                .limit(5)
+
+                .mapToDouble(actor -> actor.popularity() != null ? actor.popularity() : 0.0)
+                .sum();
+    }
+
+    private Double calculateBoxOfficeScore(Integer voteCount, Long revenue) {
+        double safeVoteCount = (voteCount != null) ? voteCount : 0.0;
+        double safeRevenue = (revenue != null) ? revenue : 0.0;
+
+
+        return (safeRevenue / 1_000_000) + (safeVoteCount / 100);
     }
 }
