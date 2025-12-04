@@ -185,6 +185,7 @@ public class TmdbService {
 
 
         return (safeRevenue / 1_000_000) + (safeVoteCount / 100);
+    }
     public TmdbPersonProfileDTO getPersonDetails(long id) {
 
 
