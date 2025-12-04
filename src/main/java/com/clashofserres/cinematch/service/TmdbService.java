@@ -9,6 +9,11 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import com.clashofserres.cinematch.data.dto.TmdbPersonProfileDTO;
+import com.clashofserres.cinematch.data.dto.TmdbCombinedCreditsResponseDTO;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 public class TmdbService {
@@ -112,7 +117,7 @@ public class TmdbService {
 
 
 
-    // Method to fetch popular actors
+
     public TmdbPersonListResponseDTO getPopularPeople() {
         String url = UriComponentsBuilder
                 .fromUriString(tmdbConfig.getBaseUrl() + "/person/popular")
@@ -124,5 +129,59 @@ public class TmdbService {
 
         TmdbPersonListResponseDTO body = response.getBody();
         return body != null ? body : new TmdbPersonListResponseDTO(0, java.util.List.of(), 0, 0);
+    }
+    public TmdbPersonProfileDTO getPersonDetails(long id) {
+
+
+        String bioUrl = UriComponentsBuilder
+                .fromUriString(tmdbConfig.getBaseUrl() + "/person/" + id)
+                .queryParam("api_key", tmdbConfig.getKey())
+                .toUriString();
+
+        ResponseEntity<TmdbPersonProfileDTO> bioResponse = restTemplate.exchange(
+                bioUrl, HttpMethod.GET, buildHeaders(), TmdbPersonProfileDTO.class
+        );
+
+        TmdbPersonProfileDTO personProfile = bioResponse.getBody();
+
+        if (personProfile == null) {
+            throw new TmdbServiceException("Person profile not found for ID: " + id);
+        }
+
+
+        String creditsUrl = UriComponentsBuilder
+                .fromUriString(tmdbConfig.getBaseUrl() + "/person/" + id + "/combined_credits")
+                .queryParam("api_key", tmdbConfig.getKey())
+                .toUriString();
+
+        ResponseEntity<TmdbCombinedCreditsResponseDTO> creditsResponse = restTemplate.exchange(
+                creditsUrl, HttpMethod.GET, buildHeaders(), TmdbCombinedCreditsResponseDTO.class
+        );
+
+        TmdbCombinedCreditsResponseDTO creditsBody = creditsResponse.getBody();
+
+
+
+        List<TmdbMovieDTO> filmography = new ArrayList<>();
+
+        if (creditsBody != null) {
+            if (creditsBody.cast() != null) {
+                filmography.addAll(creditsBody.cast());
+            }
+            if (creditsBody.crew() != null) {
+                filmography.addAll(creditsBody.crew());
+            }
+        }
+
+
+        return new TmdbPersonProfileDTO(
+                personProfile.id(),
+                personProfile.name(),
+                personProfile.profilePath(),
+                personProfile.biography(),
+                personProfile.birthday(),
+                personProfile.knownForDepartment(),
+                filmography
+        );
     }
 }
