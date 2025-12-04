@@ -17,6 +17,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
+import com.vaadin.flow.component.html.Anchor;
 
 import java.util.List;
 
@@ -87,11 +88,19 @@ public class ActorSearchView extends VerticalLayout {
         }
 
         actors.forEach(actor -> {
+
+            Long personId = actor.id();
             String name = actor.name() != null ? actor.name() : "Unknown Person";
             String profilePath = actor.profilePath();
             String knownFor = actor.knownForDepartment() != null ? actor.knownForDepartment() : "Unknown";
 
-            actorResults.add(new ActorCard(name, profilePath));
+
+            ActorCard card = new ActorCard(name, profilePath);
+
+
+            Anchor personLink = new Anchor("person/" + personId, card);
+
+            actorResults.add(personLink);
         });
     }
 }
