@@ -7,5 +7,6 @@ public record TmdbCastMemberDTO(
         String name,
         String character,
         @JsonProperty("profile_path") String profilePath,
-        Integer order) {
+        Integer order,
+        Double popularity) {
 }
