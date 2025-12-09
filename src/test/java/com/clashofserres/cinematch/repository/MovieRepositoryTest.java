@@ -25,6 +25,7 @@ class MovieRepositoryTest {
     void whenSaveAndRetrieveMovie_thenSuccess() {
         // Given
         MovieEntity movie = new MovieEntity();
+        movie.setId(555L);
         movie.setTitle("Inception");
         movie.setOverview("A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.");
         movie.setReleaseDate(LocalDate.of(2010, 7, 16));
@@ -47,14 +48,17 @@ class MovieRepositoryTest {
     void whenSaveMovieWithActors_thenRetrieveMovieWithActors() {
         // Given
         ActorEntity actor1 = new ActorEntity();
+        actor1.setId(123L);
         actor1.setName("Leonardo DiCaprio");
         entityManager.persist(actor1);
 
         ActorEntity actor2 = new ActorEntity();
+        actor2.setId(456L);
         actor2.setName("Joseph Gordon-Levitt");
         entityManager.persist(actor2);
 
         MovieEntity movie = new MovieEntity();
+        movie.setId(789L);
         movie.setTitle("Inception");
         movie.setOverview("A thief who steals corporate secrets...");
         movie.setReleaseDate(LocalDate.of(2010, 7, 16));
@@ -69,6 +73,11 @@ class MovieRepositoryTest {
         assertThat(retrievedMovieOptional).isPresent();
         MovieEntity retrievedMovie = retrievedMovieOptional.get();
         assertThat(retrievedMovie.getCast()).hasSize(2);
-        assertThat(retrievedMovie.getCast()).extracting(ActorEntity::getName).containsExactlyInAnyOrder("Leonardo", "Joseph");
+        assertThat(retrievedMovie.getCast())
+                .extracting(ActorEntity::getName)
+                .containsExactlyInAnyOrder(
+                        "Leonardo DiCaprio",
+                        "Joseph Gordon-Levitt"
+                );
     }
 }
