@@ -66,12 +66,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!--TODO REMOVE -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+
 
         <!-- load env variables -->
         <dependency>
