@@ -1,6 +1,7 @@
 package com.clashofserres.cinematch.data.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.jspecify.annotations.Nullable;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -11,20 +12,26 @@ import java.util.Set;
 public class MovieEntity extends AbstractEntity<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "movie_id")
     private Long id;
 
     @Column(nullable = false)
     private String title;
 
     @Column(length = 2000) // Μεγαλύτερο κείμενο για την περιγραφή
-    private String plot;
+    private String overview;
 
     private LocalDate releaseDate;
 
-    private String posterUrl;
+    private String posterPath;
 
-    private String genre;
+    // Store only Genere IDs. We can fetch the name of a genre from TMDB API.
+
+    private Set<Long> genreIds = new HashSet<>();
+
+    @ManyToMany(mappedBy = "watchList")
+    private Set<UserEntity> watchList = new HashSet<>();
+
 
     // Σχέση Many-to-Many με Actors
     @ManyToMany
@@ -49,18 +56,31 @@ public class MovieEntity extends AbstractEntity<Long> {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    public String getPlot() { return plot; }
-    public void setPlot(String plot) { this.plot = plot; }
+    public String getOverview() { return overview; }
+    public void setOverview(String plot) { this.overview = plot; }
 
     public LocalDate getReleaseDate() { return releaseDate; }
     public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
 
-    public String getPosterUrl() { return posterUrl; }
-    public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
+    public String getPosterPath() { return posterPath; }
+    public void setPosterPath(String posterUrl) { this.posterPath = posterUrl; }
 
-    public String getGenre() { return genre; }
-    public void setGenre(String genre) { this.genre = genre; }
+    public Set<Long> getGenreIds() {
+        return genreIds;
+    }
+
+    public void setGenreIds(Set<Long> genreIds) {
+        this.genreIds = genreIds;
+    }
 
     public Set<ActorEntity> getCast() { return cast; }
     public void setCast(Set<ActorEntity> cast) { this.cast = cast; }
+
+    public Set<UserEntity> getWatchList() {
+        return watchList;
+    }
+
+    public void setWatchList(Set<UserEntity> watchList) {
+        this.watchList = watchList;
+    }
 }

@@ -13,10 +13,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.http.ResponseEntity;
 import com.vaadin.flow.component.Component;
 
 @Route("person")
+@AnonymousAllowed
 public class PersonDetailView extends VerticalLayout implements HasUrlParameter<Long> {
 
     private final PersonController personController;

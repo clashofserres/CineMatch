@@ -16,6 +16,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.List;
 @PageTitle("Movie Search")
 @Route("movies")
 @Menu(order = 1, icon = LineAwesomeIconUrl.SEARCH_SOLID, title = "Movie Search")
+@AnonymousAllowed
 public class MovieSearchView extends VerticalLayout {
 
 	private final TmdbService tmdbService;

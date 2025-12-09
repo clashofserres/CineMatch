@@ -7,12 +7,14 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("Home")
 @Route("")
 @Menu(order = 1, icon = LineAwesomeIconUrl.SEARCH_SOLID, title = "Home")
+@AnonymousAllowed
 public class CineMatchTestView extends VerticalLayout {
 
     public CineMatchTestView() {

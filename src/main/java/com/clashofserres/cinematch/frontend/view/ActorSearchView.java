@@ -16,6 +16,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 import com.vaadin.flow.component.html.Anchor;
 
@@ -24,6 +25,7 @@ import java.util.List;
 @PageTitle("Person Search")
 @Route("Persons")
 @Menu(order = 1, icon = LineAwesomeIconUrl.SEARCH_SOLID, title = "Person Search")
+@AnonymousAllowed
 public class ActorSearchView extends VerticalLayout {
 
     private final TmdbService tmdbService;
