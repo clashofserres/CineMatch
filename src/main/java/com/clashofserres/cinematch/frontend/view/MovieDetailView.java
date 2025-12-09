@@ -15,6 +15,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @PageTitle("Movie Details")
 @Route("movie/:id")
+@AnonymousAllowed
 public class MovieDetailView extends VerticalLayout implements BeforeEnterObserver {
 
     private final TmdbService tmdbService;
@@ -301,7 +303,8 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
             String character = castMember.character() != null ? castMember.character() : "Unknown Role";
             String profilePath = castMember.profilePath();
 
-            castScroller.add(new CastMemberCard(name, character, profilePath));
+            CastMemberCard card = new CastMemberCard(name, character, profilePath);
+            castScroller.add(new Anchor("person/" + castMember.id(), card));
         });
 
         scrollerWrapper.add(castScroller);

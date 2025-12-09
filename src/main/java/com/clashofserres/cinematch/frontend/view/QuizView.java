@@ -6,13 +6,15 @@ import com.clashofserres.cinematch.frontend.component.quiz.QuizLayout;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.PermitAll;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("Movies Quiz")
 @Route("quiz")
 @Menu(order = 2, icon = LineAwesomeIconUrl.QUESTION_CIRCLE, title = "Movies Quiz")
-@PermitAll
+//@PermitAll
+@AnonymousAllowed
 public class QuizView extends VerticalLayout {
 
 	private final QuizService quizService;
