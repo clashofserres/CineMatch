@@ -27,11 +27,12 @@ public class UserService {
     }
 
     private final UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserEntity getMyUser()
@@ -100,28 +101,5 @@ public class UserService {
                 .orElseThrow(() -> new IllegalStateException("User not found"));
     }
 
-    // TODO REMOVE When login is implemented on the frontend
-    @Bean
-    public CommandLineRunner initDemoUser(UserRepository userRepository,
-                                          PasswordEncoder passwordEncoder) {
-        return args -> {
 
-            String demoEmail = "farouk_demo@example.com";
-
-            // Check if user already exists
-            if (userRepository.findByEmail(demoEmail).isEmpty()) {
-                UserEntity user = new UserEntity();
-                user.setUsername("farouk_demo");
-                user.setEmail(demoEmail);
-                user.setPasswordHash(passwordEncoder.encode("password"));
-                user.setRole("USER");
-
-                userRepository.save(user);
-
-                System.out.println("[TODO REMOVE ME PLEASE PLEASE] Demo user created: " + demoEmail);
-            } else {
-                System.out.println("[TODO REMOVE ME PLEASE PLEASE] Demo user already exists. Skipping creation.");
-            }
-        };
-    }
 }
