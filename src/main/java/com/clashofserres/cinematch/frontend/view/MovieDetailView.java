@@ -4,6 +4,7 @@ import com.clashofserres.cinematch.data.dto.TmdbCastMemberDTO;
 import com.clashofserres.cinematch.data.dto.TmdbMovieDTO;
 import com.clashofserres.cinematch.frontend.component.movie.CastMemberCard;
 import com.clashofserres.cinematch.service.TmdbService;
+import com.clashofserres.cinematch.service.WatchListService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
@@ -11,27 +12,39 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoIcon;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @PageTitle("Movie Details")
 @Route("movie/:id")
 @AnonymousAllowed
 public class MovieDetailView extends VerticalLayout implements BeforeEnterObserver {
 
-    private final TmdbService tmdbService;
-    private final VerticalLayout contentLayout = new VerticalLayout();
 
-    public MovieDetailView(TmdbService tmdbService) {
+    private final TmdbService tmdbService;
+    private final WatchListService watchListService;
+    private final VerticalLayout contentLayout = new VerticalLayout();
+    private Button watchedButton;
+    private boolean isMovieWatched = false;
+    private long currentMovieId;
+
+
+    @Autowired
+    public MovieDetailView(TmdbService tmdbService, WatchListService watchListService) {
         this.tmdbService = tmdbService;
+        this.watchListService = watchListService;
 
         setPadding(false);
         setSpacing(false);
@@ -44,6 +57,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
         add(contentLayout);
     }
 
+
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         String idParam = event.getRouteParameters().get("id").orElse(null);
@@ -55,6 +69,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
 
         try {
             long movieId = Long.parseLong(idParam);
+            currentMovieId = movieId;
             loadMovieDetails(movieId);
         } catch (NumberFormatException e) {
             showError("Invalid movie ID format");
@@ -65,18 +80,29 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
         }
     }
 
+
     private void loadMovieDetails(long movieId) {
         TmdbMovieDTO movie = tmdbService.getMovieDetails(movieId);
 
+
+        try {
+            isMovieWatched = watchListService.isInMyWatchList(movie);
+        } catch (WatchListService.WatchListServiceFail e) {
+            // Αν δεν έχει login/σφάλμα, απλά δεν είναι στο watchlist
+            isMovieWatched = false;
+        }
+
+
+
         contentLayout.removeAll();
 
-        // Header section with backdrop/poster
+
         Component header = createHeaderSection(movie);
 
-        // Info section
+
         Component infoSection = createInfoSection(movie);
 
-        // Cast section
+
         Component castSection = createCastSection(movie);
 
         contentLayout.add(header, infoSection, castSection);
@@ -90,7 +116,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
                 .set("height", "400px")
                 .set("overflow", "hidden");
 
-        // Backdrop or poster image
+
         String imageUrl;
         if (movie.backdropPath() != null && !movie.backdropPath().isEmpty()) {
             imageUrl = "https://image.tmdb.org/t/p/w1280" + movie.backdropPath();
@@ -107,7 +133,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
                     .set("height", "400px")
                     .set("object-fit", "cover");
 
-            // Gradient overlay
+
             Div overlay = new Div();
             overlay.getStyle()
                     .set("position", "absolute")
@@ -120,12 +146,12 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
 
             headerContainer.add(backdrop, overlay);
         } else {
-            // Fallback background
+
             headerContainer.getStyle()
                     .set("background-color", "var(--lumo-primary-color-10pct)");
         }
 
-        // Title overlay
+
         Div titleContainer = new Div();
         titleContainer.getStyle()
                 .set("position", "absolute")
@@ -146,6 +172,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
         return headerContainer;
     }
 
+
     private Component createInfoSection(TmdbMovieDTO movie) {
         VerticalLayout infoLayout = new VerticalLayout();
         infoLayout.setPadding(true);
@@ -155,12 +182,17 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
                 .set("max-width", "1200px")
                 .set("margin", "0 auto");
 
-        // KPIs row(Star Power Index & Box Office Score)
+
         HorizontalLayout kpiRow = new HorizontalLayout();
         kpiRow.setSpacing(true);
         kpiRow.getStyle().set("gap", "1rem");
 
-        // Star Power Index Badge
+
+        Component watchedBtn = createWatchedButton(movie);
+        kpiRow.add(watchedBtn);
+
+
+
         if (movie.starPowerIndex() != null) {
             Span starPowerBadge = new Span(String.format("Star Power: %.1f", movie.starPowerIndex()));
             starPowerBadge.getElement().getThemeList().add("badge success"); // Πράσινο χρώμα
@@ -170,7 +202,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
             kpiRow.add(starPowerBadge);
         }
 
-        // Box Office Score Badge
+
         if (movie.boxOfficeScore() != null) {
             Span boxOfficeBadge = new Span(String.format("Box Office Score: %.1f", movie.boxOfficeScore()));
             boxOfficeBadge.getElement().getThemeList().add("badge contrast"); // Γκρι/Μαύρο χρώμα
@@ -182,12 +214,13 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
 
         infoLayout.add(kpiRow);
 
-        // Metadata row (release date, rating, runtime)
+
         HorizontalLayout metadataRow = new HorizontalLayout();
         metadataRow.setSpacing(true);
         metadataRow.getStyle().set("gap", "1.5rem");
 
-        // Release date
+
+
         if (movie.releaseDate() != null && !movie.releaseDate().isEmpty()) {
             Span releaseDate = new Span(normalizeDate(movie.releaseDate()));
             releaseDate.getStyle()
@@ -196,7 +229,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
             metadataRow.add(releaseDate);
         }
 
-        // Rating
+
         if (movie.voteAverage() != null) {
             HorizontalLayout ratingLayout = new HorizontalLayout();
             ratingLayout.setSpacing(false);
@@ -216,7 +249,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
             metadataRow.add(ratingLayout);
         }
 
-        // Runtime
+
         if (movie.runtime() != null && movie.runtime() > 0) {
             Span runtime = new Span(formatRuntime(movie.runtime()));
             runtime.getStyle()
@@ -227,7 +260,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
 
         infoLayout.add(metadataRow);
 
-        // Genres
+
         if (movie.genres() != null && !movie.genres().isEmpty()) {
             FlexLayout genresLayout = new FlexLayout();
             genresLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
@@ -247,7 +280,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
             infoLayout.add(genresLayout);
         }
 
-        // Plot summary
+
         if (movie.overview() != null && !movie.overview().isEmpty()) {
             H3 overviewTitle = new H3("Overview");
             overviewTitle.getStyle().set("margin-top", "1.5rem");
@@ -265,8 +298,9 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
     }
 
     private Component createCastSection(TmdbMovieDTO movie) {
+
         if (movie.credits() == null || movie.credits().cast() == null || movie.credits().cast().isEmpty()) {
-            return new Div(); // Return empty div if no cast
+            return new Div();
         }
 
         VerticalLayout castLayout = new VerticalLayout();
@@ -279,7 +313,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
 
         H3 castTitle = new H3("Cast");
 
-        // Horizontal scroller for cast
+
         Div scrollerWrapper = new Div();
         scrollerWrapper.setWidthFull();
         scrollerWrapper.getStyle()
@@ -293,7 +327,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
                 .set("gap", "1rem")
                 .set("padding-bottom", "1rem");
 
-        // Show top 10 cast members
+
         List<TmdbCastMemberDTO> topCast = movie.credits().cast().stream()
                 .limit(10)
                 .toList();
@@ -314,6 +348,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
     }
 
     private void showError(String message) {
+
         contentLayout.removeAll();
 
         VerticalLayout errorLayout = new VerticalLayout();
@@ -333,6 +368,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
     }
 
     private String normalizeDate(String apiDate) {
+
         try {
             LocalDate date = LocalDate.parse(apiDate);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
@@ -343,11 +379,64 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
     }
 
     private String formatRuntime(int minutes) {
+
         int hours = minutes / 60;
         int mins = minutes % 60;
         if (hours > 0) {
             return String.format("%dh %dm", hours, mins);
         }
         return String.format("%dm", mins);
+    }
+
+
+
+
+    private Component createWatchedButton(TmdbMovieDTO movie) {
+        Icon icon = VaadinIcon.EYE.create();
+
+        watchedButton = new Button("Mark as Watched", icon, event -> {
+            toggleWatchedStatus(movie); // Καλούμε τη λογική
+        });
+
+        watchedButton.getStyle().set("font-weight", "bold");
+
+
+        updateWatchedButtonState();
+
+        return watchedButton;
+    }
+
+
+    private void toggleWatchedStatus(TmdbMovieDTO movie) {
+        try {
+            if (isMovieWatched) {
+                watchListService.removeFromWatchList(movie);
+                isMovieWatched = false;
+                Notification.show("Removed from Watchlist!", 3000, Notification.Position.BOTTOM_END);
+            } else {
+                watchListService.addToWatchList(movie);
+                isMovieWatched = true;
+                Notification.show("Added to Watchlist!", 3000, Notification.Position.BOTTOM_END);
+            }
+            updateWatchedButtonState();
+        } catch (WatchListService.WatchListServiceFail e) {
+
+            Notification.show(e.getMessage(), 5000, Notification.Position.MIDDLE);
+        }
+    }
+
+
+    private void updateWatchedButtonState() {
+        if (watchedButton == null) return;
+
+        if (isMovieWatched) {
+            watchedButton.setText("Watched");
+            watchedButton.getStyle().set("background-color", "var(--lumo-success-color)");
+            watchedButton.getStyle().set("color", "white");
+        } else {
+            watchedButton.setText("Mark as Watched");
+            watchedButton.getStyle().set("background-color", "var(--lumo-contrast-50pct)");
+            watchedButton.getStyle().set("color", "var(--lumo-primary-text-color)");
+        }
     }
 }
