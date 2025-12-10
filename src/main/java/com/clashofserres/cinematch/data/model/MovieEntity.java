@@ -18,14 +18,17 @@ public class MovieEntity extends AbstractEntity<Long> {
     @Column(nullable = false)
     private String title;
 
-    @Column(length = 2000) // Μεγαλύτερο κείμενο για την περιγραφή
+    @Column(name = "vote_average")
+    private Double voteAverage;
+
+    @Column(length = 2000)
     private String overview;
 
     private LocalDate releaseDate;
 
     private String posterPath;
 
-    // Store only Genere IDs. We can fetch the name of a genre from TMDB API.
+
 
     private Set<Long> genreIds = new HashSet<>();
 
@@ -33,7 +36,7 @@ public class MovieEntity extends AbstractEntity<Long> {
     private Set<UserEntity> watchList = new HashSet<>();
 
 
-    // Σχέση Many-to-Many με Actors
+
     @ManyToMany
     @JoinTable(
             name = "movie_actor",
@@ -51,7 +54,7 @@ public class MovieEntity extends AbstractEntity<Long> {
         this.id = id;
     }
 
-    // Getters & Setters
+
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -71,6 +74,14 @@ public class MovieEntity extends AbstractEntity<Long> {
 
     public void setGenreIds(Set<Long> genreIds) {
         this.genreIds = genreIds;
+    }
+
+    public Double getVoteAverage() {
+        return voteAverage;
+    }
+
+    public void setVoteAverage(Double voteAverage) {
+        this.voteAverage = voteAverage;
     }
 
     public Set<ActorEntity> getCast() { return cast; }

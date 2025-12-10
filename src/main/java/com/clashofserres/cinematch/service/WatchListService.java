@@ -11,6 +11,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.Optional;
 
@@ -55,11 +59,11 @@ public class WatchListService {
                 throw new WatchListServiceFail("Movie is already in WatchList!");
             }
 
-            // update both sides
+
             myUser.getWatchList().add(movie);
             movie.getWatchList().add(myUser);
 
-            // persist ONLY the owning side
+
            userRepository.save(myUser);
         } catch (Exception e) {
             throw new WatchListServiceFail(e.getMessage());
@@ -80,11 +84,11 @@ public class WatchListService {
                 throw new WatchListServiceFail("Movie is not in WatchList!");
             }
 
-            // remove from both sides
+
             myUser.getWatchList().remove(movie);
             movie.getWatchList().remove(myUser);
 
-            // again, save ONLY the owning side
+
             userRepository.save(myUser);
         }
         catch (Exception e) {
@@ -111,5 +115,27 @@ public class WatchListService {
         MovieEntity movie = movieEntityOpt.get();
 
         return myUser.getWatchList().contains(movie);
+    }
+    @Transactional(readOnly = true)
+    public List<TmdbMovieDTO> getWatchList() throws WatchListServiceFail {
+        try {
+            UserEntity myUser = userService.getMyUserOptional()
+                    .orElseThrow(() -> new WatchListServiceFail("No user logged in!"));
+
+
+            Hibernate.initialize(myUser.getWatchList());
+
+
+            return myUser.getWatchList().stream()
+                    .map(movieService::convertToTmdbMovieDTO) // <--- Υποθέτουμε ότι υπάρχει αυτή η μέθοδος
+                    .collect(Collectors.toList());
+
+        } catch (WatchListServiceFail e) {
+
+            throw e;
+        } catch (Exception e) {
+
+            throw new WatchListServiceFail("Failed to retrieve watchlist: " + e.getMessage());
+        }
     }
 }
