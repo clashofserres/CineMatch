@@ -1,10 +1,14 @@
 package com.clashofserres.cinematch.frontend.view;
+import com.clashofserres.cinematch.data.model.QuizResultEntity;
 
 import com.clashofserres.cinematch.data.model.UserEntity;
 import com.clashofserres.cinematch.service.UserService;
+import com.clashofserres.cinematch.service.QuizService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
@@ -14,11 +18,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Route("profile")
 @PageTitle("My Profile")
@@ -27,18 +35,24 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 public class ProfileView extends VerticalLayout {
 
     private final UserService userService;
+    private final QuizService quizService;
 
     // --- Profile Details Section ---
     private final TextField usernameField = new TextField("Username");
     private final EmailField emailField = new EmailField("Email");
     private final Span watchlistBadge = new Span();
 
+
     // --- Password Change Section ---
     private final PasswordField currentPasswordField = new PasswordField("Current Password");
     private final PasswordField newPasswordField = new PasswordField("New Password");
 
-    public ProfileView(UserService userService) {
+    // --- Quiz History Section ---
+    private UserEntity currentUser;
+
+    public ProfileView(UserService userService,QuizService quizService) {
         this.userService = userService;
+        this.quizService = quizService;
 
         setSpacing(true);
         setPadding(true);
@@ -47,12 +61,12 @@ public class ProfileView extends VerticalLayout {
 
         // Load initial data
         try {
-            UserEntity user = userService.getMyUser();
-            usernameField.setValue(user.getUsername());
-            emailField.setValue(user.getEmail());
+            this.currentUser  = userService.getMyUser();
+            usernameField.setValue(currentUser.getUsername());
+            emailField.setValue(currentUser.getEmail());
 
             // --- Badge Logic ---
-            int count = (user.getWatchList() != null) ? user.getWatchList().size() : 0;
+            int count = (currentUser.getWatchList() != null) ? currentUser.getWatchList().size() : 0;
             watchlistBadge.setText(String.valueOf(count));
 
             // Reset styles to ensure clean state
@@ -78,7 +92,9 @@ public class ProfileView extends VerticalLayout {
         add(
                 createProfileSection(),
                 new Hr(),
-                createPasswordSection()
+                createPasswordSection(),
+                new Hr(),
+                createQuizHistorySection()
         );
     }
 
@@ -116,6 +132,57 @@ public class ProfileView extends VerticalLayout {
         section.setPadding(false);
         return section;
     }
+
+    // ---  ΙΣΤΟΡΙΚΟ ---
+    private VerticalLayout createQuizHistorySection() {
+        H3 title = new H3("Quiz History");
+
+
+        Grid<QuizResultEntity> grid = new Grid<>(QuizResultEntity.class, false);
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COMPACT);
+        grid.setAllRowsVisible(true); // Να φαίνονται όλα χωρίς scroll μέσα στο grid
+
+
+        grid.addColumn(result -> result.getTimestamp().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")))
+                .setHeader("Date Played")
+                .setAutoWidth(true);
+
+
+        grid.addColumn(result -> result.getScore() + " / 5")
+                .setHeader("Score")
+                .setAutoWidth(true);
+
+
+        grid.addColumn(new ComponentRenderer<>(result -> {
+            Span badge = new Span();
+            int score = result.getScore();
+
+            if (score == 5) {
+                badge.setText("Perfect! 🏆");
+                badge.getElement().getThemeList().add("badge success");
+            } else if (score >= 3) {
+                badge.setText("Good Job 👍");
+                badge.getElement().getThemeList().add("badge success primary");
+            } else {
+                badge.setText("Try Again 😅");
+                badge.getElement().getThemeList().add("badge contrast");
+            }
+            return badge;
+        })).setHeader("Result");
+
+
+        if (currentUser != null) {
+            List<QuizResultEntity> history = quizService.getUserQuizHistory(currentUser.getId());
+
+            history.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
+            grid.setItems(history);
+        }
+
+        VerticalLayout section = new VerticalLayout(title, grid);
+        section.setPadding(false);
+        return section;
+    }
+    // ------------------------------------
 
     private void onUpdateProfile() {
         try {

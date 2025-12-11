@@ -10,6 +10,7 @@ import com.clashofserres.cinematch.data.dto.TmdbPersonProfileDTO;
 import com.clashofserres.cinematch.data.dto.TmdbCombinedCreditsResponseDTO;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 import java.util.Comparator;
@@ -239,5 +240,26 @@ public class TmdbService {
                 personProfile.knownForDepartment(),
                 filmography
         );
+    }
+
+    public TmdbMovieListResponseDTO getMoviesByGenres(List<Integer> genreIds) {
+
+        String genresParam = genreIds.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining("|"));
+
+        String url = UriComponentsBuilder
+                .fromUriString(tmdbConfig.getBaseUrl() + "/discover/movie")
+                .queryParam("api_key", tmdbConfig.getKey())
+                .queryParam("with_genres", genresParam) // Φίλτρο ειδών
+                .queryParam("sort_by", "popularity.desc") // Φέρε τις δημοφιλείς αυτών των ειδών
+                .queryParam("language", "en-US")
+                .toUriString();
+
+        ResponseEntity<TmdbMovieListResponseDTO> response = restTemplate.exchange(
+                url, HttpMethod.GET, buildHeaders(), TmdbMovieListResponseDTO.class);
+
+        TmdbMovieListResponseDTO body = response.getBody();
+        return body != null ? body : new TmdbMovieListResponseDTO(0, java.util.List.of(), 0, 0);
     }
 }
