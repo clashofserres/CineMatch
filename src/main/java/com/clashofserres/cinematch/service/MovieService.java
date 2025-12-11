@@ -65,7 +65,7 @@ public class MovieService {
 
 
         movieEntity.setGenreIds(getGenreIds(movieDTO.genres()));
-        movieEntity.setCast(getCastFromMovieDTO(movieDTO.credits().cast()));
+        //movieEntity.setCast(getCastFromMovieDTO(movieDTO.credits().cast()));
 
         return movieEntity;
     }
