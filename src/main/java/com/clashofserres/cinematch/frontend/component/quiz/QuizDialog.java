@@ -13,6 +13,7 @@ import com.vaadin.flow.component.notification.Notification;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class QuizDialog extends Dialog
@@ -21,7 +22,7 @@ public class QuizDialog extends Dialog
 	private final Map<QuizQuestionDTO, RadioButtonGroup<String>> answerInputs = new HashMap<>();
 	private QuizLayout quizLayout;
 
-	public QuizDialog(Supplier<QuizDTO> quizCallback)
+	public QuizDialog(Supplier<QuizDTO> quizCallback,Consumer<Integer> onSaveResult)
 	{
 
 		setWidth("600px");
@@ -29,7 +30,7 @@ public class QuizDialog extends Dialog
 		setCloseOnEsc(true);
 		//setCloseOnOutsideClick(true);
 
-		quizLayout = new QuizLayout(quizCallback);
+		quizLayout = new QuizLayout(quizCallback,onSaveResult);
 		add(quizLayout);
 	}
 }

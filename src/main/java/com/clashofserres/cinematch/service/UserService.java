@@ -42,6 +42,11 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+
+    public Optional<UserEntity> getUserById(Long id) {
+        return userRepository.findById(id);
+    }
+
     public boolean isLoggedIn() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsername(username).isPresent();

@@ -5,16 +5,24 @@ import com.clashofserres.cinematch.data.dto.TmdbMovieDTO;
 import com.clashofserres.cinematch.data.dto.TmdbMovieListResponseDTO;
 import com.clashofserres.cinematch.data.dto.huggingface.*;
 import com.clashofserres.cinematch.data.dto.quiz.QuizDTO;
+import com.clashofserres.cinematch.data.model.QuizResultEntity;
+import com.clashofserres.cinematch.data.model.UserEntity;
+import com.clashofserres.cinematch.data.repository.QuizResultRepository;
 import com.clashofserres.cinematch.service.helpers.JSONHelper;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import com.clashofserres.cinematch.data.model.MovieEntity;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class QuizService {
@@ -27,14 +35,17 @@ public class QuizService {
 
 	private final HuggingFaceConfig huggingFaceConfig;
 	private final TmdbService tmdbService;
-
+    private final UserService userService;
+    private final QuizResultRepository quizResultRepository;
 	private final RestTemplate restTemplate;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public QuizService(HuggingFaceConfig huggingFaceConfig, TmdbService tmdbService) {
+	public QuizService(HuggingFaceConfig huggingFaceConfig, TmdbService tmdbService, UserService userService, QuizResultRepository quizResultRepository) {
 		this.tmdbService = tmdbService;
 		this.huggingFaceConfig = huggingFaceConfig;
+        this.userService = userService;
+        this.quizResultRepository = quizResultRepository;
 		this.restTemplate = new RestTemplate();
 
 		mapper.configure(JsonReadFeature.ALLOW_SINGLE_QUOTES.mappedFeature(), true);
@@ -182,6 +193,92 @@ public class QuizService {
 		}
 	}
 
+    // ---------------------------
+    // PERSONALIZED QUIZ LOGIC (NEW)
+    // ---------------------------
+
+    public QuizDTO generatePersonalizedQuiz(Long userId) {
+        try {
+
+            UserEntity user = userService.getUserById(userId).orElse(null);
+
+            if (user == null || user.getWatchList() == null || user.getWatchList().isEmpty()) {
+                System.out.println("User has no history. Generating random popular quiz.");
+                return tryGeneratePopularMovieQuizWithRetries(3);
+            }
+
+            Set<TmdbMovieDTO> watchedMoviesDTOs = user.getWatchList().stream()
+                    .map(entity -> {
+                        try {
+                            // ΠΡΟΣΟΧΗ: Εδώ χρησιμοποιούμε το entity.getId().
+                            // Αν το ID στη βάση σου είναι ίδιο με του TMDB (π.χ. 550 για Fight Club), είσαι οκ.
+                            return tmdbService.getMovieDetails(entity.getId());
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    })
+                    .filter(movie -> movie != null)
+                    .collect(Collectors.toSet());
+
+            if (watchedMoviesDTOs.isEmpty()) {
+                return tryGeneratePopularMovieQuizWithRetries(3);
+            }
+
+            List<Integer> topGenres = getTopGenres(watchedMoviesDTOs);
+
+            if (topGenres.isEmpty()) {
+                return tryGeneratePopularMovieQuizWithRetries(3);
+            }
+
+            TmdbMovieListResponseDTO responseDTO = tmdbService.getMoviesByGenres(topGenres);
+            List<TmdbMovieDTO> genreMovies = responseDTO.results();
+
+            if (genreMovies.isEmpty()) {
+                return tryGeneratePopularMovieQuizWithRetries(3);
+            }
+
+            Collections.shuffle(genreMovies);
+            List<TmdbMovieDTO> selectedMovies = genreMovies.stream().limit(6).toList();
+
+            HuggingFaceResponseDTO hfResponse = sendHuggingFaceRequest(buildMultiMoviePrompt(selectedMovies));
+            if (hfResponse != null && hfResponse.getChoices() != null && !hfResponse.getChoices().isEmpty()) {
+                String content = hfResponse.getChoices().get(0).getMessage().getContent();
+                return parseQuiz(content);
+            }
+            return tryGeneratePopularMovieQuizWithRetries(3);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Αν κάτι πάει στραβά, γυρνάμε στο default
+            return tryGeneratePopularMovieQuizWithRetries(3);
+        }
+    }
+
+
+    private List<Integer> getTopGenres(Set<TmdbMovieDTO> watchedMovies) {
+
+        Map<Integer, Long> genreFrequency = watchedMovies.stream()
+                .filter(m -> m.genreIds() != null)
+                .flatMap(m -> m.genreIds().stream())
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+
+        return genreFrequency.entrySet().stream()
+                .sorted(Map.Entry.<Integer, Long>comparingByValue().reversed())
+                .limit(3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
+
+    // ---------------------------
+    // SAVE RESULTS (NEW)
+    // ---------------------------
+    public void saveQuizResult(Long userId, int score) {
+        QuizResultEntity result = new QuizResultEntity(userId, score);
+        quizResultRepository.save(result);
+    }
+
+
 
 	// ---------------------------
 	// Generate Quiz
@@ -241,25 +338,10 @@ public class QuizService {
 		}
 	}
 
+    public List<QuizResultEntity> getUserQuizHistory(Long userId) {
+        return quizResultRepository.findByUserId(userId);
+    }
 
-
-	public QuizDTO tryGenerateQuizWithRetries(TmdbMovieDTO movie, int maxAttempts) {
-		for (int attempt = 1; attempt <= maxAttempts; attempt++) {
-
-			try {
-				QuizDTO quiz = generateQuizForMovie(movie);
-
-				if (quiz.getQuestions() != null && quiz.getQuestions().size() >= 5) {
-					return quiz; // SUCCESS
-				}
-			}
-			catch (Exception e) {
-				// Log if needed, but no need to break — retry
-			}
-		}
-
-		return null; // FAILED after attempts
-	}
 
 	public QuizDTO tryGeneratePopularMovieQuizWithRetries(int maxAttempts) {
 		for (int attempt = 1; attempt <= maxAttempts; attempt++) {

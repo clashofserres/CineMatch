@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @NpmPackage(value = "canvas-confetti", version = "1.5.1")
@@ -27,14 +28,15 @@ public class QuizLayout extends VerticalLayout {
 	private final ExecutorService executorService = Executors.newCachedThreadPool();
 	private final VerticalLayout quizContainer = new VerticalLayout();
 	private final Supplier<QuizDTO> quizCallback;
-
+    private final Consumer<Integer> onSaveResult;
 	// Game State
 	private QuizDTO currentQuiz;
 	private int currentQuestionIndex = 0;
 	private int score = 0;
 
-	public QuizLayout(Supplier<QuizDTO> quizCallback) {
+	public QuizLayout(Supplier<QuizDTO> quizCallback,Consumer<Integer> onSaveResult) {
 		this.quizCallback = quizCallback;
+        this.onSaveResult = onSaveResult;
 
 		setPadding(true);
 		setSpacing(true);
@@ -168,6 +170,10 @@ public class QuizLayout extends VerticalLayout {
 
 	private void showFinalResults() {
 		quizContainer.removeAll();
+
+        if (onSaveResult != null) {
+            onSaveResult.accept(score);
+        }
 
 		int total = currentQuiz.getQuestions().size();
 		double percentage = (double) score / total;

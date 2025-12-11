@@ -86,8 +86,5 @@ public class UserEntity extends AbstractEntity<Long> {
         return watchList;
     }
 
-    public void setWatchList(Set<MovieEntity> watchList) {
-        this.watchList = watchList;
-    }
 
 }
