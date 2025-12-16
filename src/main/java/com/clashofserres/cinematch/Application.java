@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.sql.init.SqlDataSourceScriptDataba
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * The entry point of the Spring Boot application.
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Bean;
  */
 @Push
 @SpringBootApplication
+@EnableAsync
 @EnableConfigurationProperties
 @Theme(value = "cinematch", variant = Lumo.DARK)
 public class Application implements AppShellConfigurator {
