@@ -110,13 +110,13 @@ public class UserService {
             throw new InvalidCredentials("Email cannot be empty");
         }
 
-        // Username changed? Check if taken by another user.
+
         if (!newUsername.equals(user.getUsername()) &&
                 userRepository.findByUsername(newUsername).isPresent()) {
             throw new InvalidCredentials("Username already taken");
         }
 
-        // Email changed? Check if taken by another user.
+
         if (!newEmail.equals(user.getEmail()) &&
                 userRepository.findByEmail(newEmail).isPresent()) {
             throw new InvalidCredentials("Email already taken");
@@ -127,7 +127,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        // Refresh the security context so the logged-in session reflects the new username
+
         updateSecurityContext(user);
 
         return user;
@@ -144,12 +144,12 @@ public class UserService {
             throw new InvalidCredentials("Current password is incorrect");
         }
 
-        // 2. Validate new password inputs
+
         if (newPassword == null || newPassword.isEmpty()) {
             throw new InvalidCredentials("New password cannot be empty");
         }
 
-        // (Optional) Add strength checks here, e.g., length > 6
+
         if (newPassword.length() < 6) {
             throw new InvalidCredentials("Password is too short (min 6 characters)");
         }

@@ -17,7 +17,7 @@ public class ActorEntity extends AbstractEntity<Long> {
     @Column(nullable = false)
     private String name;
 
-    // Η άλλη πλευρά της σχέσης (mappedBy)
+
     @ManyToMany(mappedBy = "cast")
     private Set<MovieEntity> movies = new HashSet<>();
 

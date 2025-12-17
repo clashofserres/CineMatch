@@ -1,69 +1,65 @@
-# CineMatch
+#  Cinematch
 
-# TODO: Adjust this read me
+---
+>Η κινηματογραφική σου βιβλιοθήκη, σε μία εφαρμογή.
 
-This project can be used as a starting point to create your own Vaadin application with Spring Boot.
-It contains all the necessary configuration and some placeholder files to get you started.
+To **Cinematch** είναι μια εφαρμογή γραμμένη στην **Java**, σχεδιασμένη για να προσφέρει μια ολοκληρωμένη εμπειρία ενημέρωσης και ψυχαγωγίας γύρω από τον κόσμο του σινεμά.
 
-## Running the application
+---
+# Λειτουργίες
 
-Open the project in an IDE. You can download the [IntelliJ community edition](https://www.jetbrains.com/idea/download) if you do not have a suitable IDE already.
-Once opened in the IDE, locate the `Application` class and run the main method using "Debug".
+### Διαχείρηση λογαριασμού
+* **Login Panel:** Ασφαλής σύνδεση και ταυτοποίηση χρήστη.
+* **Διαχείριση Προφίλ:** Δυνατότητα αλλαγής **Username**, **Password** και **Email**.
+* **Favorite Movies:** Προσθήκη και διαχείριση της προσωπικής σας λίστας αγαπημένων ταινιών.
 
-For more information on installing in various IDEs, see [how to import Vaadin projects to different IDEs](https://vaadin.com/docs/latest/getting-started/import).
+###  Ανακάλυψη Περιεχομένου
+* **Trending Movies:** Άμεση ενημέρωση για τις πιο δημοφιλείς ταινίες της εποχής.
+* **Person Search:** Αναζήτηση πληροφοριών για **Ηθοποιούς** και **Σκηνοθέτες**.
 
-If you install the Vaadin plugin for IntelliJ, you should instead launch the `Application` class using "Debug using HotswapAgent" to see updates in the Java code immediately reflected in the browser.
+### Ψυχαγωγία
+* **Quiz Games:** Τεστ γνώσεων για να αποδείξετε πόσο καλά γνωρίζετε τις αγαπήμενες σας ταινίες.
 
-## Deploying to Production
+---
+# Προϋπόθεσεις
 
-The project is a standard Maven project. To create a production build, call 
+### Για να τρέξετε την εφαρμογή θα πρεπει να έχετε την εφαρμογή **Docker** εγκαστεστημένη στον υπολογιστή σας.
 
-```
-./mvnw clean package -Pproduction
-```
+---
 
-If you have Maven globally installed, you can replace `./mvnw` with `mvn`.
+# Screenshots
+<details>
+  <summary> Κάντε Κλίκ για να δείτε τα Screenshots της Εφαρμογής.</summary>
 
-This will build a JAR file with all the dependencies and front-end resources,ready to be run. The file can be found in the `target` folder after the build completes.
-You then launch the application using 
-```
-java -jar target/cinematch-1.0-SNAPSHOT.jar
-```
+### Movie Search
+![Movie Search](assets/CINEMATCH2.png)
 
-## Project structure
+### Movie Details
+![Movie Details](assets/CINEMATCH-DETAILS.png)
 
-- `MainLayout.java` in `src/main/java` contains the navigation setup (i.e., the
-  side/top bar and the main menu). This setup uses
-  [App Layout](https://vaadin.com/docs/components/app-layout).
-- `views` package in `src/main/java` contains the server-side Java views of your application.
-- `views` folder in `src/main/frontend` contains the client-side JavaScript views of your application.
-- `themes` folder in `src/main/frontend` contains the custom CSS styles.
+### Person Search
+![Person Search](assets/CINEMATCH3.png)
 
-## Useful links
+### Person Details
+![Person Details](assets/CINEMATCH-PERSONDETAILS.png)
 
-- Read the documentation at [vaadin.com/docs](https://vaadin.com/docs).
-- Follow the tutorial at [vaadin.com/docs/latest/tutorial/overview](https://vaadin.com/docs/latest/tutorial/overview).
-- Create new projects at [start.vaadin.com](https://start.vaadin.com/).
-- Search UI components and their usage examples at [vaadin.com/docs/latest/components](https://vaadin.com/docs/latest/components).
-- View use case applications that demonstrate Vaadin capabilities at [vaadin.com/examples-and-demos](https://vaadin.com/examples-and-demos).
-- Build any UI without custom CSS by discovering Vaadin's set of [CSS utility classes](https://vaadin.com/docs/styling/lumo/utility-classes). 
-- Find a collection of solutions to common use cases at [cookbook.vaadin.com](https://cookbook.vaadin.com/).
-- Find add-ons at [vaadin.com/directory](https://vaadin.com/directory).
-- Ask questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/vaadin) or join our [Forum](https://vaadin.com/forum).
-- Report issues, create pull requests in [GitHub](https://github.com/vaadin).
+### Quiz
+![Quiz](assets/CINEMATCH4.png)
 
+### Profile Panel
+![Profile Panel](assets/CINEMATCH5.png)
+</details>
 
-## Deploying using Docker
+---
+#  Project Manager
+* [@nikosxrist](https://github.com/nikosxrist)
+#  Συμμετέχοντες
+* [@Far0yk](https://github.com/Far0yk)
 
-To build the Dockerized version of the project, run
+* [@EvriZapt](https://github.com/EvriZapt)
 
-```
-mvn clean package -Pproduction
-docker build . -t cinematch:latest
-```
+* [@drmqwerty](https://github.com/drmqwerty)
 
-Once the Docker image is correctly built, you can test it locally using
+* [@ThodorisT30](https://github.com/ThodorisT30)
 
-```
-docker run -p 8080:8080 cinematch:latest
-```
+* [@kobas2310](https://github.com/kobas2310)

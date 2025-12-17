@@ -1,5 +1,4 @@
 package com.clashofserres.cinematch.frontend.view;
-import com.clashofserres.cinematch.data.dto.TmdbMovieDTO;
 import com.clashofserres.cinematch.data.model.QuizResultEntity;
 
 import com.clashofserres.cinematch.data.model.UserEntity;
@@ -15,10 +14,8 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -42,20 +39,20 @@ public class ProfileView extends VerticalLayout {
     private final UserService userService;
     private final QuizService quizService;
 
-    // --- Profile Details Section ---
+
     private final TextField usernameField = new TextField("Username");
     private final EmailField emailField = new EmailField("Email");
     private final Span watchlistBadge = new Span();
 
 
-    // --- Password Change Section ---
+
     private final PasswordField currentPasswordField = new PasswordField("Current Password");
     private final PasswordField newPasswordField = new PasswordField("New Password");
 
-    // --- Quiz History Section ---
+
     private UserEntity currentUser;
 
-    // --- Review History Section ---
+
     private final MovieReviewsComponent movieReviewsComponent;
 
     public ProfileView(UserService userService,QuizService quizService,
@@ -69,17 +66,17 @@ public class ProfileView extends VerticalLayout {
         setMaxWidth("800px");
         setDefaultHorizontalComponentAlignment(Alignment.START);
 
-        // Load initial data
+
         try {
             this.currentUser  = userService.getMyUser();
             usernameField.setValue(currentUser.getUsername());
             emailField.setValue(currentUser.getEmail());
 
-            // --- Badge Logic ---
+
             int count = (currentUser.getWatchList() != null) ? currentUser.getWatchList().size() : 0;
             watchlistBadge.setText(String.valueOf(count));
 
-            // Reset styles to ensure clean state
+
             watchlistBadge.getElement().getThemeList().clear();
             watchlistBadge.getStyle().clear();
 
@@ -144,7 +141,7 @@ public class ProfileView extends VerticalLayout {
         return section;
     }
 
-    // ---  ΙΣΤΟΡΙΚΟ ---
+
     private VerticalLayout createQuizHistorySection() {
         H3 title = new H3("Quiz History");
 
@@ -183,6 +180,7 @@ public class ProfileView extends VerticalLayout {
 
 
         if (currentUser != null) {
+            assert currentUser.getId() != null;
             List<QuizResultEntity> history = quizService.getUserQuizHistory(currentUser.getId());
 
             history.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));

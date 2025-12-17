@@ -19,12 +19,10 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 @AnonymousAllowed
 public class LoginView extends Main implements BeforeEnterObserver {
 
-    private final UserService userService;
     private final LoginOverlay loginOverlay;
     private final RegisterDialog registerDialog;
 
     public LoginView(UserService userService) {
-        this.userService = userService;
 
         addClassNames(LumoUtility.Display.FLEX,
                 LumoUtility.JustifyContent.CENTER,
@@ -42,9 +40,7 @@ public class LoginView extends Main implements BeforeEnterObserver {
         VerticalLayout layout = new VerticalLayout();
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         
-        Button registerButton = new Button("Don't have an account yet?", event -> {
-            registerDialog.open();
-        });
+        Button registerButton = new Button("Don't have an account yet?", event -> registerDialog.open());
         registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
         layout.add(registerButton);
         

@@ -71,10 +71,7 @@ public class PersonDetailView extends VerticalLayout implements HasUrlParameter<
         filmographyLayout.getStyle().set("gap", "15px");
 
         if (profile.filmography() != null && !profile.filmography().isEmpty()) {
-            profile.filmography().forEach(movie -> {
-
-                filmographyLayout.add(createFilmographyCard(movie));
-            });
+            profile.filmography().forEach(movie -> filmographyLayout.add(createFilmographyCard(movie)));
         } else {
             filmographyLayout.add(new Div("No major credits found."));
         }
