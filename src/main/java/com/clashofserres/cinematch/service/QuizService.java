@@ -27,6 +27,8 @@ import java.util.List;
 @Service
 public class QuizService {
 
+	private final HuggingFaceService huggingFaceService;
+
 	public static class QuizServiceException extends RuntimeException {
 		public QuizServiceException(String message) { super(message); }
 	}
@@ -37,18 +39,16 @@ public class QuizService {
 	private final TmdbService tmdbService;
     private final UserService userService;
     private final QuizResultRepository quizResultRepository;
-	private final RestTemplate restTemplate;
-
 	private final ObjectMapper mapper = new ObjectMapper();
 
-	public QuizService(HuggingFaceConfig huggingFaceConfig, TmdbService tmdbService, UserService userService, QuizResultRepository quizResultRepository) {
+	public QuizService(HuggingFaceConfig huggingFaceConfig, TmdbService tmdbService, UserService userService, QuizResultRepository quizResultRepository, HuggingFaceService huggingFaceService) {
 		this.tmdbService = tmdbService;
 		this.huggingFaceConfig = huggingFaceConfig;
         this.userService = userService;
         this.quizResultRepository = quizResultRepository;
-		this.restTemplate = new RestTemplate();
 
 		mapper.configure(JsonReadFeature.ALLOW_SINGLE_QUOTES.mappedFeature(), true);
+		this.huggingFaceService = huggingFaceService;
 	}
 
 	private String buildMoviePrompt(TmdbMovieDTO movie) {
@@ -133,46 +133,12 @@ public class QuizService {
            """.formatted(movieListString, NUMBER_OF_QUESTIONS);
 	}
 
-
-	// ---------------------------
-	// Build HuggingFace request
-	// ---------------------------
-	private HuggingFaceRequestDTO buildRequest(String prompt) {
-		List<HuggingFaceChatMessageDTO> list = List.of(
-				new HuggingFaceChatMessageDTO("system", "/no_think"),
-				new HuggingFaceChatMessageDTO("user", prompt));
-
-		return new HuggingFaceRequestDTO(huggingFaceConfig.getModel(), list,10000);
-	}
-
-	// ---------------------------
-	// Send HF request
-	// ---------------------------
 	private HuggingFaceResponseDTO sendHuggingFaceRequest(String prompt) {
-
-		HuggingFaceRequestDTO requestDTO = buildRequest(prompt);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setBearerAuth(huggingFaceConfig.getToken());
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-
-		HttpEntity<HuggingFaceRequestDTO> entity = new HttpEntity<>(requestDTO, headers);
-
-		ResponseEntity<HuggingFaceResponseDTO> response = restTemplate.exchange(
-				huggingFaceConfig.getBaseUrl() + "chat/completions",
-				HttpMethod.POST,
-				entity,
-				HuggingFaceResponseDTO.class
-		);
-
-		HuggingFaceResponseDTO body = response.getBody();
-
-		if (body == null || body.getChoices() == null || body.getChoices().isEmpty()) {
-			throw new QuizServiceException("No valid completion returned from HuggingFace.");
+		try {
+			return huggingFaceService.sendRequest(prompt);
+		} catch (HuggingFaceService.HuggingFaceServiceException e) {
+			throw new QuizServiceException(e.getMessage());
 		}
-
-		return body;
 	}
 
 	// ---------------------------

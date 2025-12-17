@@ -1,9 +1,12 @@
 package com.clashofserres.cinematch.frontend.view;
+import com.clashofserres.cinematch.data.dto.TmdbMovieDTO;
 import com.clashofserres.cinematch.data.model.QuizResultEntity;
 
 import com.clashofserres.cinematch.data.model.UserEntity;
+import com.clashofserres.cinematch.frontend.component.review.MovieReviewsComponent;
 import com.clashofserres.cinematch.service.UserService;
 import com.clashofserres.cinematch.service.QuizService;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -12,8 +15,10 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -50,9 +55,14 @@ public class ProfileView extends VerticalLayout {
     // --- Quiz History Section ---
     private UserEntity currentUser;
 
-    public ProfileView(UserService userService,QuizService quizService) {
+    // --- Review History Section ---
+    private final MovieReviewsComponent movieReviewsComponent;
+
+    public ProfileView(UserService userService,QuizService quizService,
+                       MovieReviewsComponent movieReviewsComponent) {
         this.userService = userService;
         this.quizService = quizService;
+        this.movieReviewsComponent = movieReviewsComponent;
 
         setSpacing(true);
         setPadding(true);
@@ -88,13 +98,14 @@ public class ProfileView extends VerticalLayout {
             showNotification("Error loading user data", true);
         }
 
-
         add(
                 createProfileSection(),
                 new Hr(),
                 createPasswordSection(),
                 new Hr(),
-                createQuizHistorySection()
+                createQuizHistorySection(),
+                new Hr(),
+                creatReviewSection()
         );
     }
 
@@ -182,6 +193,16 @@ public class ProfileView extends VerticalLayout {
         section.setPadding(false);
         return section;
     }
+    private Component creatReviewSection() {
+        movieReviewsComponent.loadMyReviews();
+
+        VerticalLayout reviewLayout = new VerticalLayout();
+        reviewLayout.setPadding(false);
+        reviewLayout.add(new H3("Reviews"), movieReviewsComponent);
+        return reviewLayout;
+    }
+
+
     // ------------------------------------
 
     private void onUpdateProfile() {

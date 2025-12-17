@@ -1,6 +1,8 @@
 package com.clashofserres.cinematch.frontend.core;
 
+import com.clashofserres.cinematch.frontend.view.LibraryView;
 import com.clashofserres.cinematch.frontend.view.LoginView;
+import com.clashofserres.cinematch.frontend.view.ProfileView;
 import com.clashofserres.cinematch.service.UserService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -160,7 +162,7 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
 
         var user = userOptional.get();
         avatar = new Avatar(user.getUsername());
-        avatar.setColorIndex(user.getId().intValue());
+        avatar.setColorIndex(Math.toIntExact(user.getId()));
 
         VerticalLayout avatarHolder = new VerticalLayout(avatar);
         avatarHolder.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -174,9 +176,10 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
         avatar.addClassNames(LumoUtility.Margin.Right.SMALL);
 
         userMenuItem.getSubMenu().addItem("Profile", menuItemClickEvent -> {
-            UI.getCurrent().navigate("profile");
-            // TODO: switch to this
-            //UI.getCurrent().navigate(ProfileView.class));
+            UI.getCurrent().navigate(ProfileView.class);
+        });
+        userMenuItem.getSubMenu().addItem("Library", menuItemClickEvent -> {
+            UI.getCurrent().navigate(LibraryView.class);
         });
         userMenuItem.getSubMenu().addItem("Logout", menuItemClickEvent -> {
             authenticationContext.logout();

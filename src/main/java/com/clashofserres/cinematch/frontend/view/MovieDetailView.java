@@ -3,12 +3,18 @@ package com.clashofserres.cinematch.frontend.view;
 import com.clashofserres.cinematch.data.dto.TmdbCastMemberDTO;
 import com.clashofserres.cinematch.data.dto.TmdbMovieDTO;
 import com.clashofserres.cinematch.frontend.component.movie.CastMemberCard;
+import com.clashofserres.cinematch.frontend.component.review.MovieReviewsComponent;
+import com.clashofserres.cinematch.frontend.component.review.MovieReviewInputLayout;
+import com.clashofserres.cinematch.service.ReviewService;
 import com.clashofserres.cinematch.service.TmdbService;
+import com.clashofserres.cinematch.service.UserService;
 import com.clashofserres.cinematch.service.WatchListService;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -25,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 @PageTitle("Movie Details")
 @Route("movie/:id")
@@ -36,15 +41,25 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
     private final TmdbService tmdbService;
     private final WatchListService watchListService;
     private final VerticalLayout contentLayout = new VerticalLayout();
+    private final UserService userService;
+    private final ReviewService reviewService;
     private Button watchedButton;
     private boolean isMovieWatched = false;
     private long currentMovieId;
 
+    private final MovieReviewsComponent movieReviewsComponent;
 
     @Autowired
-    public MovieDetailView(TmdbService tmdbService, WatchListService watchListService) {
+    public MovieDetailView(TmdbService tmdbService,
+                           WatchListService watchListService,
+                           UserService userService,
+                           ReviewService reviewService,
+                           MovieReviewsComponent movieReviewsComponent) {
         this.tmdbService = tmdbService;
         this.watchListService = watchListService;
+        this.userService = userService;
+        this.reviewService = reviewService;
+        this.movieReviewsComponent = movieReviewsComponent;
 
         setPadding(false);
         setSpacing(false);
@@ -105,7 +120,16 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
 
         Component castSection = createCastSection(movie);
 
-        contentLayout.add(header, infoSection, castSection);
+        Component createReviewSection = createWriteReviewSection(movie);
+
+        Component reviewSection = creatReviewSection(movie);
+
+        contentLayout.add(header,
+                infoSection,
+                castSection,
+                new Hr(),
+                createReviewSection,
+                reviewSection);
     }
 
     private Component createHeaderSection(TmdbMovieDTO movie) {
@@ -347,6 +371,58 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
         return castLayout;
     }
 
+    private Component createWriteReviewSection(TmdbMovieDTO movie) {
+        VerticalLayout reviewLayout = new VerticalLayout();
+        reviewLayout.setPadding(true);
+        reviewLayout.setSpacing(true);
+        reviewLayout.setWidthFull();
+        reviewLayout.getStyle()
+                .set("max-width", "1200px")
+                .set("margin", "0 auto");
+
+
+        H3 writeAReview = new H3("Write a Review");
+        MovieReviewInputLayout reviewInput = new MovieReviewInputLayout();
+        reviewInput.setIsLoggedIn(userService.isLoggedIn());
+        reviewInput.setSubmitCallback((String Content)-> {
+            try {
+                reviewService.writeReview(movie, Content);
+                reviewInput.resetContent();
+                movieReviewsComponent.refreshReviews();
+                showNotification("Review Submitted Successfully", NotificationVariant.LUMO_SUCCESS);
+            } catch (ReviewService.ReviewFailedException e) {
+                showNotification("Error Submitting Review: " + e.getMessage(), NotificationVariant.LUMO_ERROR);
+            }
+        });
+        reviewLayout.add(writeAReview, reviewInput);
+        return reviewLayout;
+    }
+
+    private Component creatReviewSection(TmdbMovieDTO movie) {
+        VerticalLayout reviewLayout = new VerticalLayout();
+        reviewLayout.setPadding(true);
+        reviewLayout.setSpacing(true);
+        reviewLayout.setWidthFull();
+        reviewLayout.getStyle()
+                .set("max-width", "1200px")
+                .set("margin", "0 auto");
+
+        movieReviewsComponent.setMovieId(movie.id());
+
+        Button refreshButton = new Button(
+                "Refresh Reviews", VaadinIcon.REFRESH.create(), e -> {
+            movieReviewsComponent.refreshReviews();
+        });
+        refreshButton.setTooltipText("Load the latest reviews for this movie.");
+
+        HorizontalLayout controls = new HorizontalLayout(new H3("Reviews"), refreshButton);
+        controls.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        controls.setAlignItems(Alignment.CENTER);
+
+        reviewLayout.add(controls, movieReviewsComponent);
+        return reviewLayout;
+    }
+
     private void showError(String message) {
 
         contentLayout.removeAll();
@@ -365,6 +441,13 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
 
         errorLayout.add(errorIcon, errorText);
         contentLayout.add(errorLayout);
+    }
+
+    private void showNotification(String text, NotificationVariant variant) {
+        Notification notification = Notification.show(text);
+        notification.addThemeVariants(variant);
+        notification.setPosition(Notification.Position.TOP_START);
+        notification.setDuration(2500);
     }
 
     private String normalizeDate(String apiDate) {
@@ -387,7 +470,6 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
         }
         return String.format("%dm", mins);
     }
-
 
 
 

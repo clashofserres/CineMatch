@@ -88,7 +88,6 @@ public class TmdbService {
         TmdbMovieListResponseDTO body = response.getBody();
         return body != null ? body : new TmdbMovieListResponseDTO(0, java.util.List.of(), 0, 0);
     }
-
     // ----------------------------------
     // ACTOR (PERSON) METHODS
     // ----------------------------------

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,6 +47,10 @@ public class UserService {
 
     public Optional<UserEntity> getUserById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public List<UserEntity> findUsersByIdIsIn(Collection<Long> userIds) {
+        return userRepository.findByIdIsIn(userIds);
     }
 
     public boolean isLoggedIn() {
