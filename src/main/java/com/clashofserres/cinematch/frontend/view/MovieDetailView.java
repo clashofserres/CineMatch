@@ -10,7 +10,6 @@ import com.clashofserres.cinematch.service.TmdbService;
 import com.clashofserres.cinematch.service.UserService;
 import com.clashofserres.cinematch.service.WatchListService;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -45,7 +44,6 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
     private final ReviewService reviewService;
     private Button watchedButton;
     private boolean isMovieWatched = false;
-    private long currentMovieId;
 
     private final MovieReviewsComponent movieReviewsComponent;
 
@@ -84,7 +82,6 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
 
         try {
             long movieId = Long.parseLong(idParam);
-            currentMovieId = movieId;
             loadMovieDetails(movieId);
         } catch (NumberFormatException e) {
             showError("Invalid movie ID format");
@@ -410,9 +407,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
         movieReviewsComponent.setMovieId(movie.id());
 
         Button refreshButton = new Button(
-                "Refresh Reviews", VaadinIcon.REFRESH.create(), e -> {
-            movieReviewsComponent.refreshReviews();
-        });
+                "Refresh Reviews", VaadinIcon.REFRESH.create(), e -> movieReviewsComponent.refreshReviews());
         refreshButton.setTooltipText("Load the latest reviews for this movie.");
 
         HorizontalLayout controls = new HorizontalLayout(new H3("Reviews"), refreshButton);

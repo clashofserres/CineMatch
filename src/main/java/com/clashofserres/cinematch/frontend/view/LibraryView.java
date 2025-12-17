@@ -3,9 +3,9 @@ package com.clashofserres.cinematch.frontend.view;
 import com.clashofserres.cinematch.data.dto.TmdbMovieDTO;
 import com.clashofserres.cinematch.frontend.component.movie.MovieCard;
 import com.clashofserres.cinematch.service.WatchListService;
-import com.vaadin.flow.component.UI;
+
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -15,7 +15,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 
-import java.util.Collections;
+
 import java.util.List;
 
 @PageTitle("My Library")
@@ -68,7 +68,7 @@ public class LibraryView extends VerticalLayout {
             return;
         }
 
-        if (watchedMovies == null || watchedMovies.isEmpty()) {
+        if (watchedMovies.isEmpty()) {
             add(new H3("Your Watchlist is empty. Start adding movies!"));
             return;
         }

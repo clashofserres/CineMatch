@@ -30,8 +30,7 @@ public class MovieSearchView extends VerticalLayout {
 	private final TmdbService tmdbService;
 
 	private final FlexLayout movieResults = new FlexLayout();
-	private final VerticalLayout movieHolder = new VerticalLayout();
-	private final H2 whatsHotText = new H2("See what's hot right now 🔥");
+    private final H2 whatsHotText = new H2("See what's hot right now 🔥");
 
 	public MovieSearchView(TmdbService tmdbService) {
 		this.tmdbService = tmdbService;
@@ -53,7 +52,8 @@ public class MovieSearchView extends VerticalLayout {
 		movieResults.getStyle().set("gap", "18px");
 		movieResults.setWidthFull();
 
-		movieHolder.add(whatsHotText, movieResults);
+        VerticalLayout movieHolder = new VerticalLayout();
+        movieHolder.add(whatsHotText, movieResults);
 
 		add(searchBar, movieHolder);
 
