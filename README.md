@@ -29,7 +29,10 @@ To **Cinematch** είναι μια εφαρμογή γραμμένη στην **
 
 # Screenshots
 <details>
-  <summary> Κάντε Κλίκ για να δείτε τα Screenshots της Εφαρμογής.</summary>
+<summary> Κάντε Κλίκ για να δείτε τα Screenshots της Εφαρμογής.</summary>
+
+### Login Panel
+![Movie Search](assets/CINEMATCH.png)
 
 ### Movie Search
 ![Movie Search](assets/CINEMATCH2.png)
