@@ -75,3 +75,94 @@ html, spreadsheet-view-export, grid-with-filters-view-export
     box-shadow: var(--lumo-box-shadow-m); /* Adds a medium shadow */
     cursor: pointer; /* Changes mouse cursor to a hand */
 }
+
+
+
+/* 2. Typography & Contrast (Refine Appearance) */
+.movie-overview {
+    line-height: 1.8 !important;
+    color: var(--lumo-header-text-color);
+    font-size: 1.1rem !important;
+        margin-top: 1.5rem !important;
+        max-width: 900px !important;
+        opacity: 0.9 !important;
+        }
+
+.movie-metadata-row span {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.movie-metadata-row {
+    gap: 2rem !important;
+    color: var(--lumo-secondary-text-color) !important;
+    font-size: var(--lumo-font-size-m) !important;
+}
+
+/* 3. Button Consistency */
+vaadin-button {
+    cursor: pointer !important;
+        transition: all 0.2s ease-in-out !important;
+}
+
+vaadin-button:hover {
+    filter: brightness(1.1) !important;
+    transform: translateY(-2px) !important;
+}
+
+
+vaadin-button[theme~="success"] {
+    box-shadow: 0 4px 12px var(--lumo-success-color-50pct) !important;
+}
+.v-loading-indicator {
+    display: none !important;
+}
+
+/* Σιγουρέψου ότι ο spinner έχει μέγεθος και είναι ορατός */
+.v-loading-indicator {
+    display: block !important;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px !important; /* Λίγο πιο παχιά για να φαίνεται */
+    background-color: transparent !important;
+    z-index: 9999;
+}
+
+/* Το χρώμα της μπάρας που τρέχει */
+.v-loading-indicator:before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    background-color: #ffab00 !important; /* Το πορτοκαλί του theme σου */
+    box-shadow: 0 0 10px #ffab00;
+    animation: v-progress 2s infinite linear;
+}
+
+@keyframes v-progress {
+    0% { width: 0; left: 0; }
+    50% { width: 70%; left: 20%; }
+    100% { width: 100%; left: 100%; }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.movie-card, .cast-member-card {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+.tight-metadata {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    display: block !important;
+}
+
+.movie-metadata-row {
+    gap: 6px !important;
+}

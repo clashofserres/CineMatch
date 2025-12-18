@@ -54,6 +54,10 @@ public class ActorSearchView extends VerticalLayout {
         actorResults.getStyle().set("gap", "18px");
         actorResults.setWidthFull();
 
+        actorHolder.setWidthFull();
+        actorHolder.setAlignItems(Alignment.CENTER);
+        actorHolder.setPadding(false);
+
         actorHolder.add(whatsHotText, actorResults);
         add(searchBar, actorHolder);
 
@@ -71,14 +75,22 @@ public class ActorSearchView extends VerticalLayout {
 
     private void searchActors(String query) {
         whatsHotText.setVisible(false);
+        actorResults.setVisible(false);
+
+
         TmdbPersonListResponseDTO response = tmdbService.searchPeople(query);
         renderActors(response.results());
+        actorResults.setVisible(true);
     }
 
     private void loadPopularActors() {
         whatsHotText.setVisible(true);
+        actorResults.setVisible(false);
+
         TmdbPersonListResponseDTO response = tmdbService.getPopularPeople();
         renderActors(response.results());
+
+        actorResults.setVisible(true);
     }
 
     private void renderActors(List<TmdbPersonDTO> actors) {
@@ -99,8 +111,10 @@ public class ActorSearchView extends VerticalLayout {
 
             ActorCard card = new ActorCard(name, profilePath);
 
+            card.addClassName("offset-hovered-element");
 
             Anchor personLink = new Anchor("person/" + personId, card);
+
 
             actorResults.add(personLink);
         });
