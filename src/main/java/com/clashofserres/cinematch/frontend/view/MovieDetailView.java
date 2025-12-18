@@ -238,6 +238,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
 
         HorizontalLayout metadataRow = new HorizontalLayout();
         metadataRow.setSpacing(true);
+        metadataRow.addClassName("movie-metadata-row");
         metadataRow.getStyle().set("gap", "1.5rem");
 
 
@@ -307,10 +308,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
             overviewTitle.getStyle().set("margin-top", "1.5rem");
 
             Paragraph overview = new Paragraph(movie.overview());
-            overview.getStyle()
-                    .set("font-size", "var(--lumo-font-size-m)")
-                    .set("line-height", "1.6")
-                    .set("color", "var(--lumo-body-text-color)");
+            overview.addClassName("movie-overview");
 
             infoLayout.add(overviewTitle, overview);
         }
@@ -359,6 +357,7 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
             String profilePath = castMember.profilePath();
 
             CastMemberCard card = new CastMemberCard(name, character, profilePath);
+            card.addClassName("offset-hovered-element");
             castScroller.add(new Anchor("person/" + castMember.id(), card));
         });
 
@@ -506,14 +505,18 @@ public class MovieDetailView extends VerticalLayout implements BeforeEnterObserv
     private void updateWatchedButtonState() {
         if (watchedButton == null) return;
 
+        watchedButton.getElement().getThemeList().remove("success");
+        watchedButton.getElement().getThemeList().remove("contrast");
+
         if (isMovieWatched) {
             watchedButton.setText("Watched");
-            watchedButton.getStyle().set("background-color", "var(--lumo-success-color)");
+            watchedButton.getElement().getThemeList().add("success primary");
+            watchedButton.getStyle().remove("background-color"); // Βγάζουμε τα manual styles
             watchedButton.getStyle().set("color", "white");
         } else {
             watchedButton.setText("Mark as Watched");
-            watchedButton.getStyle().set("background-color", "var(--lumo-contrast-50pct)");
-            watchedButton.getStyle().set("color", "var(--lumo-primary-text-color)");
+            watchedButton.getElement().getThemeList().add("contrast");
+            watchedButton.getStyle().remove("background-color");
         }
     }
 }

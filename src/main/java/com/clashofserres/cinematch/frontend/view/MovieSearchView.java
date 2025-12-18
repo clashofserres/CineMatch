@@ -18,6 +18,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
+import com.vaadin.flow.component.progressbar.ProgressBar;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.Component;
 
 import java.util.List;
 
@@ -28,7 +31,7 @@ import java.util.List;
 public class MovieSearchView extends VerticalLayout {
 
 	private final TmdbService tmdbService;
-
+	private Icon spinner;
 	private final FlexLayout movieResults = new FlexLayout();
     private final H2 whatsHotText = new H2("See what's hot right now 🔥");
 
@@ -48,12 +51,21 @@ public class MovieSearchView extends VerticalLayout {
 		searchBar.setWidthFull();
 		searchBar.setAlignItems(Alignment.END);
 
+		spinner = VaadinIcon.REFRESH.create();
+		spinner.addClassName("spinning-icon");
+		spinner.setVisible(false);
+		spinner.getStyle().set("color", "#ffab00");
+		spinner.getStyle().set("font-size", "var(--lumo-size-xl)");
+
 		movieResults.setFlexWrap(FlexLayout.FlexWrap.WRAP);
 		movieResults.getStyle().set("gap", "18px");
 		movieResults.setWidthFull();
 
-        VerticalLayout movieHolder = new VerticalLayout();
-        movieHolder.add(whatsHotText, movieResults);
+
+		VerticalLayout movieHolder = new VerticalLayout();
+		movieHolder.setAlignItems(Alignment.CENTER);
+		movieHolder.add(whatsHotText, spinner, movieResults);
+		movieHolder.setWidthFull();
 
 		add(searchBar, movieHolder);
 
@@ -69,16 +81,32 @@ public class MovieSearchView extends VerticalLayout {
 		loadPopularMovies();
 	}
 
+
 	private void searchMovies(String query) {
 		whatsHotText.setVisible(false);
+		movieResults.removeAll();
+		movieResults.setVisible(false);
+		spinner.setVisible(true);
+
+
 		TmdbMovieListResponseDTO response = tmdbService.searchMovies(query);
 		renderMovies(response.results());
+
+		spinner.setVisible(false);
+		movieResults.setVisible(true);
 	}
 
 	private void loadPopularMovies() {
 		whatsHotText.setVisible(true);
+		movieResults.setVisible(false);
+		spinner.setVisible(true);
+
+
 		TmdbMovieListResponseDTO response = tmdbService.getPopularMovies();
 		renderMovies(response.results());
+
+		spinner.setVisible(false);
+		movieResults.setVisible(true);
 	}
 
 	private void renderMovies(List<TmdbMovieDTO> movies) {

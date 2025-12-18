@@ -16,6 +16,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.springframework.http.ResponseEntity;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.Paragraph;
 
 @Route("person")
 @AnonymousAllowed
@@ -52,18 +54,32 @@ public class PersonDetailView extends VerticalLayout implements HasUrlParameter<
     private void displayProfile(TmdbPersonProfileDTO profile) {
         removeAll();
 
+        VerticalLayout mainContent = new VerticalLayout();
+        mainContent.getStyle().set("max-width", "1000px").set("margin", "0 auto");
+
 
         H1 name = new H1(profile.name());
         Image profilePic = new Image("https://image.tmdb.org/t/p/w300" + profile.profilePath(), profile.name() + " Picture");
         profilePic.getStyle().set("border-radius", "8px");
 
-        Div bioDetails = new Div();
-        bioDetails.add(new Div("Birthday: " + profile.birthday()));
-        bioDetails.add(new Div("Known For: " + profile.knownForDepartment()));
+        VerticalLayout bioInfo = new VerticalLayout();
+        bioInfo.setPadding(false);
+        bioInfo.setSpacing(false);
+        bioInfo.getStyle().set("gap", "4px");
+        bioInfo.addClassName("movie-metadata-row");
 
-        Div biography = new Div(profile.biography());
-        biography.getStyle().set("margin-top", "15px");
 
+        Span birthday = new Span("🎂 Birthday: " + profile.birthday());
+        Span knownFor = new Span("🎬 Known For: " + profile.knownForDepartment());
+
+        birthday.addClassName("tight-metadata");
+        knownFor.addClassName("tight-metadata");
+
+        Paragraph biography = new Paragraph(profile.biography());
+        biography.addClassName("movie-overview");
+        biography.getStyle().set("margin-top", "20px");
+
+        bioInfo.add(birthday, knownFor);
 
         H2 filmographyHeader = new H2("Filmography / Known For");
         FlexLayout filmographyLayout = new FlexLayout();
@@ -78,7 +94,7 @@ public class PersonDetailView extends VerticalLayout implements HasUrlParameter<
 
 
         add(name, profilePic);
-        add(bioDetails, biography);
+        add(bioInfo, biography);
         add(filmographyHeader, filmographyLayout);
     }
 
@@ -92,8 +108,9 @@ public class PersonDetailView extends VerticalLayout implements HasUrlParameter<
         VerticalLayout cardLayout = new VerticalLayout();
         cardLayout.setSpacing(false);
         cardLayout.setPadding(false);
-        cardLayout.setWidth("120px");
+        cardLayout.setWidth("140px");
 
+        cardLayout.addClassName("offset-hovered-element");
 
         Image posterImage;
         if (posterPath != null) {
