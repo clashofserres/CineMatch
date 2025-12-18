@@ -261,4 +261,19 @@ public class TmdbService {
         TmdbMovieListResponseDTO body = response.getBody();
         return body != null ? body : new TmdbMovieListResponseDTO(0, java.util.List.of(), 0, 0);
     }
+
+    // SIMILAR MOVIES
+    public TmdbMovieListResponseDTO getSimilarMovies(long movieId) {
+        String url = UriComponentsBuilder
+                .fromUriString(tmdbConfig.getBaseUrl() + "/movie/" + movieId + "/recommendations")
+                .queryParam("api_key", tmdbConfig.getKey())
+                .queryParam("language", "en-US")
+                .queryParam("page", 1)
+                .toUriString();
+
+        ResponseEntity<TmdbMovieListResponseDTO> response = restTemplate.exchange(
+                url, HttpMethod.GET, buildHeaders(), TmdbMovieListResponseDTO.class);
+
+        return response.getBody() != null ? response.getBody() : new TmdbMovieListResponseDTO(0, java.util.List.of(), 0, 0);
+    }
 }
